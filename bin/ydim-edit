@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# ypdmd -- ydim -- 09.11.2005 -- hwyss@ywesee.com
+
+require 'ydim/server'
+require 'ydim/odba'
+require 'rclconf'
+require 'odba/connection_pool'
+require 'irb'
+
+module YDIM
+	class Server
+		attr_reader :serv
+	end
+end
+
+ydim_default_dir = File.join(ENV['HOME'], '.ydim')
+default_config_files = [
+	File.join(ydim_default_dir, 'ydimd.yml'),
+	'/etc/ydim/ydimd.yml',
+]
+defaults = {
+	'autoinvoice_hour'=> 1,
+	'config'					=> default_config_files,
+	'conf_dir'				=> File.join(ydim_default_dir, 'conf'),
+	'data_dir'				=> File.join(ydim_default_dir, 'data'),
+	'server_url'			=> 'druby://localhost:12375', 
+	'db_driver_url'		=> 'DBI:pg:ydim',
+	'db_user'					=> 'ydim',
+	'db_auth'					=> '',
+	'log_level'				=> 'INFO',
+	'log_file'				=> STDOUT,
+	'mail_sender'			=> '',
+	'mail_recipients'	=> [],
+	'root_name'				=> 'Root',
+	'root_email'			=> '',
+	'root_key'				=> 'root_dsa',
+	'smtp_from'				=> '',
+	'smtp_server'			=> 'localhost',
+	'vat_rate'				=> 7.6,
+}
+config = RCLConf::RCLConf.new(ARGV, defaults)
+config.load(config.config)
+
+ODBA.storage.dbi = ODBA::ConnectionPool.new(config.db_driver_url, 
+	config.db_user, config.db_auth)
+
+logger = Logger.new($stdout)
+logger.level = Logger.const_get(config.log_level)
+$server = YDIM::Server.new(config, logger)
+$needle = $server.serv
+
+IRB.start
