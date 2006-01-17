@@ -6,7 +6,7 @@ module YDIM
 		attr_reader :unique_id, :invoices
 		attr_accessor :email, :name, :contact, :address_lines, :location,
 			:debitor_type, :hosting_price, :hosting_invoice_interval, 
-			:hosting_invoice_date
+			:hosting_invoice_date, :salutation
 		def initialize(unique_id)
 			@unique_id = unique_id
 			@address_lines = []
@@ -18,7 +18,7 @@ module YDIM
 		end
 		def address
 			lns = [@name]
-			lns.push("z.H. #@contact") if(@contact)
+			lns.push(["z.H.", @salutation, @contact].compact.join(' '))
 			lns.concat(@address_lines)
 			lns.push(@email)
 			lns.compact!
