@@ -10,7 +10,7 @@ module YDIM
 			@serv = serv
 		end
 		def create_invoice(debitor)
-			id = @serv.id_server.next_id(:invoice)
+			id = @serv.id_server.next_id(:invoice, @serv.config.invoice_number_start)
 			invoice = Invoice.new(id)
 			yield(invoice) if(block_given?)
 			invoice.debitor = debitor
