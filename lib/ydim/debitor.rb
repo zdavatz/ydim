@@ -33,5 +33,8 @@ module YDIM
 			}
 			nil
 		end
+		def next_invoice_date
+			@hosting_invoice_date
+		end
 	end
 end
