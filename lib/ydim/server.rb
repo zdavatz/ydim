@@ -14,6 +14,7 @@ require 'ydim/util'
 
 module YDIM
 	class Server
+		SECONDS_IN_DAY = 24*60*60
 		def initialize(config, logger)
 			@serv = Needle::Registry.new
 			@serv.register(:auth_server) { 
@@ -84,15 +85,16 @@ module YDIM
 				Thread.current.abort_on_exception = true
 				loop {
 					now = Time.now
-					desired = Time.local(now.year, now.month, now.day, 
-															 @serv.config.autoinvoice_hour)
-					sleepy_time = desired - now
+					next_run = Time.local(now.year, now.month, now.day,
+																@serv.config.autoinvoice_hour)
+					sleepy_time = next_run - now
 					if(sleepy_time < 0)
-						sleepy_time += 24*60*60
+						sleepy_time += SECONDS_IN_DAY
+						next_run += SECONDS_IN_DAY
 					end
 					@serv.logger.info('AutoInvoicer') {
 						sprintf("next run %s, sleeping %i seconds", 
-										desired.strftime("%c"), sleepy_time)
+										next_run.strftime("%c"), sleepy_time)
 					}
 					sleep(sleepy_time)
 					AutoInvoicer.new(@serv).run
