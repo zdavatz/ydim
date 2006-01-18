@@ -20,6 +20,7 @@ module YDIM
 			@precision = 0
 		end
 		def add_item(item)
+			item.index = next_item_id
 			@items.push(item)
 			item
 		end
@@ -61,5 +62,11 @@ module YDIM
 		sum :total_brutto
 		sum :total_netto
 		sum :vat
+		private
+		def next_item_id
+			id = @next_item_id.to_i
+			@next_item_id = id.next
+			id
+		end
 	end
 end

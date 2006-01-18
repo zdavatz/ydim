@@ -18,10 +18,14 @@ module YDIM
 		def test_create_invoice
 			id_server = FlexMock.new
 			invoices = {}
+			config = FlexMock.new
+			@serv.mock_handle(:config) { config }
 			@serv.mock_handle(:id_server) { id_server }
 			@serv.mock_handle(:invoices) { invoices }
 			@serv.mock_handle(:debitors) { debitors }
-			id_server.mock_handle(:next_id) { |key|
+			config.mock_handle(:invoice_number_start) { 13 }	
+			id_server.mock_handle(:next_id) { |key, start|
+				assert_equal(13, start)
 				assert_equal(:invoice, key)
 				24
 			}

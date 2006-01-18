@@ -28,11 +28,14 @@ module YDIM
 			logger.mock_verify
 		end
 		def test_add_items
+			config = FlexMock.new
+			config.mock_handle(:vat_rate) { 7.6 }
 			invoice = FlexMock.new
 			invoices = {
 				123 => invoice,	
 			}
 			@serv.mock_handle(:invoices) { invoices }
+			@serv.mock_handle(:config) { config }
 			items = [
 				{	:quantity => 1, :unit => 'Stück', :text => 'Item 1', :price => 10.00,
 					:vat_rate => 7.6, :data => {}, :time => Time.now, :expiry_time => nil},
@@ -110,6 +113,30 @@ module YDIM
 				assert_raises(IndexError) { @session.debitor(2) }
 			}
 		end
+		def test_delete_item
+			invoices = FlexMock.new
+			invoice = FlexMock.new
+			item1 = FlexMock.new
+			item1.mock_handle(:index) { 0 }
+			item2 = FlexMock.new
+			item2.mock_handle(:index) { 1 }
+			item3 = FlexMock.new
+			item3.mock_handle(:index) { 2 }
+			items = [item1, item2, item3]
+			@serv.mock_handle(:invoices) { invoices }
+			invoices.mock_handle(:fetch) { |id|
+				assert_equal(3, id)
+				invoice
+			}
+			invoice.mock_handle(:items) { items }
+			invoice.mock_handle(:odba_store, 1) {}
+			retval = nil
+			assert_logged(:debug) {
+				retval = @session.delete_item(3, 1)
+			}
+			assert_equal([item1,item3], retval)
+			invoice.mock_verify
+		end
 		def test_search_debitors
 			debitors = FlexMock.new
 			@serv.mock_handle(:debitors) { debitors }
@@ -128,6 +155,8 @@ module YDIM
 			assert_equal([], @session.search_debitors('unknown@ywesee.com'))
 			assert_equal([debitor], @session.search_debitors('ywesee GmbH'))
 			assert_equal([debitor], @session.search_debitors('test@ywesee.com'))
+		end
+		def test_update_item
 		end
 	end
 end

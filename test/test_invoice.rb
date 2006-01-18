@@ -14,10 +14,19 @@ module YDIM
 		end
 		def test_add_item
 			assert_equal([], @invoice.items)
+			item_id = 0
 			item = FlexMock.new
+			item.mock_handle(:index=, 2) { |idx|
+				assert_equal(item_id, idx)
+				item_id += 1
+			}
 			retval = @invoice.add_item(item)
 			assert_equal([item], @invoice.items)
 			assert_equal(item, retval)
+			retval = @invoice.add_item(item)
+			assert_equal([item, item], @invoice.items)
+			assert_equal(item, retval)
+			item.mock_verify
 		end
 		def test_debitor_writer
 			debitor = FlexMock.new
