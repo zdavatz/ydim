@@ -20,7 +20,7 @@ module YDIM
 			lns = [@name]
 			lns.push(["z.H.", @salutation, @contact].compact.join(' '))
 			lns.concat(@address_lines)
-			lns.push(@email)
+			lns.push(@location, @email)
 			lns.compact!
 			lns
 		end
