@@ -33,6 +33,11 @@ module YDIM
 			end
 			@debitor = debitor
 		end
+		def due_date
+			if(@date && !@payment_received)
+				@date + @payment_period.to_i
+			end
+		end
 		def payment_status
 			if(@payment_received)
 				'ps_paid'

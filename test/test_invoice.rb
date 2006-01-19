@@ -46,6 +46,16 @@ module YDIM
 			debitor.mock_verify
 			debitor2.mock_verify
 		end
+		def test_due_date
+			assert_nil(@invoice.due_date)
+			today = Date.today
+			@invoice.date = today
+			assert_equal(today, @invoice.due_date)
+			@invoice.payment_period = 10
+			assert_equal(today + 10, @invoice.due_date)
+			@invoice.payment_received = true
+			assert_nil(@invoice.due_date)
+		end
 		def test_pdf_invoice
 			debitor = FlexMock.new
 			debitor.mock_handle(:add_invoice, 1) { |arg|
