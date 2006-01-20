@@ -17,8 +17,8 @@ module YDIM
 		end
 		def update(data)
 			data.each { |key, val|
-				if(DATA_KEYS.include?(key))
-					instance_variable_set("@#{key}", data[key])
+				if(DATA_KEYS.include?(key.to_sym))
+					instance_variable_set("@#{key}", val)
 				end
 			}
 		end

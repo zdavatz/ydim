@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+input = if(File.exist?(ARGV.first.to_s))
+					File.read(ARGV.unshift)
+				else
+					STDIN.read
+				end
+
+require 'yaml'
+
+data = YAML.load(input) || exit(-1)
+
+require 'openssl'
+require 'rrba/error'
+require 'ydim/config'
+require 'ydim/client'
+
+config = YDIM::Client::CONFIG
+server = DRb::DRbObject.new(nil, config.server_url)
+client = YDIM::Client.new(config)
+key = OpenSSL::PKey::DSA.new(File.read(config.private_key))
+
+DRb.start_service
+
+client.login(server, key)
+invoice = client.create_invoice(data['debitor'])
+invoice.description = data['description'] || 'Auto-Invoice'
+invoice.date = Date.today
+client.add_items(invoice.unique_id, data['items'])
+client.send_invoice(invoice.unique_id)
+client.logout

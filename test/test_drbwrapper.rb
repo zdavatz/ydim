@@ -27,5 +27,13 @@ module YDIM
 			obj = @wrapper.foo
 			assert_raises(TypeError) { Marshal.dump(obj) }
 		end
+		def test_rewrap__block
+			orig = Object.new 
+			orig.extend(ODBA::Persistable)
+			@obj.mock_handle(:foo) { |block| block.call(orig) }
+			@wrapper.foo { |obj|
+				assert_raises(TypeError) { Marshal.dump(obj) }
+			}
+		end
 	end
 end
