@@ -42,6 +42,15 @@ module YDIM
 				@serv.factory.create_invoice(debitor(debitor_id))
 			}
 		end
+		def create_hosting_item(debitor_id)
+			@serv.logger.debug(whoami) { 
+				"create_hosting_item(#{debitor_id})" }
+			debitor = debitor(debitor_id)
+			item = Item.new
+			debitor.add_hosting_item(item)
+			debitor.odba_store
+			debitor.hosting_items
+		end
 		def debitor(debitor_id)
 			@serv.debitors.fetch(debitor_id)
 		rescue IndexError
@@ -51,8 +60,16 @@ module YDIM
 		def debitors
 			@serv.debitors.values
 		end
+		def delete_hosting_item(debitor_id, index)
+			@serv.logger.debug(whoami) { 
+				"delete_hosting_item(#{debitor_id}, #{index})" }
+			debitor = debitor(debitor_id)
+			debitor.hosting_items.delete_if { |item| item.index == index }
+			debitor.odba_store
+			debitor.hosting_items
+		end
 		def delete_item(invoice_id, index)
-			@serv.logger.debug(whoami) { "delete_items(#{invoice_id}, #{index})" }
+			@serv.logger.debug(whoami) { "delete_item(#{invoice_id}, #{index})" }
 			invoice = invoice(invoice_id)
 			invoice.items.delete_if { |item| item.index == index }
 			invoice.odba_store
@@ -75,11 +92,20 @@ module YDIM
 			@serv.logger.info(whoami) { "send_invoice(#{invoice_id})" }
 			Mail.send_invoice(@serv.config, invoice(invoice_id))
 		end
+		def update_hosting_item(debitor_id, index, data)
+			@serv.logger.debug(whoami) { 
+				"update_hosting_item(#{debitor_id}, #{index}, #{data.inspect})" }
+			debitor = debitor(debitor_id)
+			item = debitor.hosting_item(index)
+			item.update(data)
+			debitor.odba_store
+			item
+		end
 		def update_item(invoice_id, index, data)
 			@serv.logger.debug(whoami) { 
 				"update_item(#{invoice_id}, #{index}, #{data.inspect})" }
 			invoice = invoice(invoice_id)
-			item = invoice.items.find { |item| item.index == index }
+			item = invoice.item(index)
 			item.update(data)
 			invoice.odba_store
 			item

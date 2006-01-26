@@ -3,6 +3,7 @@
 
 require 'pdfinvoice/config'
 require 'pdfinvoice/invoice'
+require 'ydim/item'
 
 module YDIM
 	class Invoice
@@ -38,6 +39,9 @@ module YDIM
 				@date + @payment_period.to_i
 			end
 		end
+		def item(index)
+			@items.find { |item| item.index == index }
+		end
 		def payment_status
 			if(@payment_received)
 				'ps_paid'
@@ -68,10 +72,6 @@ module YDIM
 		sum :total_netto
 		sum :vat
 		private
-		def next_item_id
-			id = @next_item_id.to_i
-			@next_item_id = id.next
-			id
-		end
+		include ItemId
 	end
 end

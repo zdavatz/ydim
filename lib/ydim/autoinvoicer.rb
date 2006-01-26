@@ -34,20 +34,30 @@ module YDIM
 				description = sprintf("Hosting %s", invoice_interval)
 				time = Time.now
 				expiry_time = Time.local(expdate.year, expdate.month, expdate.day)
-				item = Item.new
-				item.text = description
-				item.item_type = :hosting
-				item.quantity = months
-				item.unit = 'Monate'
-				item.price = price.to_f
-				item.vat_rate = @serv.config.vat_rate
-				item.time = time
-				item.expiry_time = expiry_time
+				data = {
+					:text				=>	description,
+					:item_type	=>	:hosting,
+					:quantity		=>	months,
+					:unit				=>	'Monate',
+					:price			=>	price.to_f,
+					:vat_rate		=>	@serv.config.vat_rate,
+					:time				=>	time,
+					:expiry_time=>	expiry_time
+				}
+				item = Item.new(data)
 				ODBA.transaction {
 					invoice = @serv.factory.create_invoice(debitor) { |inv|
 						inv.date = date
 						inv.description = description
 						inv.add_item(item)
+						debitor.hosting_items.each { |templ|
+							data.update({
+								:item_type=>	:domain_pointer,
+								:text			=>	"Domain-Pointer: #{templ.text}",
+								:price		=>	templ.price.to_f,
+							})
+							inv.add_item(Item.new(data))
+						}
 					}
 					Mail.send_invoice(@serv.config, invoice) 
 					debitor.hosting_invoice_date = expdate

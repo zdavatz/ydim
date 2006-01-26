@@ -26,4 +26,11 @@ module YDIM
 			total_netto * (@vat_rate.to_f / 100.0)
 		end
 	end
+	module ItemId
+		def next_item_id
+			id = @next_item_id.to_i
+			@next_item_id = id.next
+			id
+		end
+	end
 end

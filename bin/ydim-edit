@@ -27,6 +27,7 @@ defaults = {
 	'db_driver_url'		=> 'DBI:pg:ydim',
 	'db_user'					=> 'ydim',
 	'db_auth'					=> '',
+	'invoice_number_start'	=> 10000,
 	'log_level'				=> 'INFO',
 	'log_file'				=> STDOUT,
 	'mail_sender'			=> '',

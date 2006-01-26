@@ -8,7 +8,7 @@ require 'ydim/invoice'
 module YDIM
 	class Debitor
 		include ODBA::Persistable
-		ODBA_SERIALIZABLE = ['@address_lines']
+		ODBA_SERIALIZABLE = ['@address_lines', '@hosting_items']
 	end
 	class Invoice
 		include ODBA::Persistable
