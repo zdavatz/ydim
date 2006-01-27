@@ -19,7 +19,7 @@ module YDIM
 			}
 		end
 		def logout
-			@server.logout(@session)
+			@server.logout(@session) if(@server)
 		end
 		def method_missing(meth, *args, &block)
 			@session.send(meth, *args, &block)

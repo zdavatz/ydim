@@ -59,6 +59,7 @@ module YDIM
 			if(config.autoinvoice_hour)
 				run_autoinvoice_thread
 			end
+			@sessions = []
 		end
 		def login(client, name=nil, &block)
 			@serv.logger.debug(client.__drburi) { 'attempting login' }
@@ -66,6 +67,7 @@ module YDIM
 			session.serv = @serv
 			session.client = client
 			@serv.logger.info(session.whoami) { 'login' }
+			@sessions.push(session)
 			session
 		rescue Exception => error
 			@serv.logger.error('unknown user') { 
@@ -74,6 +76,7 @@ module YDIM
 		end
 		def logout(session)
 			@serv.logger.info(session.whoami) { 'logout' }
+			@sessions.delete(session)
 			nil
 		end
 		def ping
