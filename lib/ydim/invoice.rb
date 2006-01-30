@@ -9,7 +9,7 @@ module YDIM
 	class Invoice
 		attr_reader :unique_id, :debitor, :items
 		attr_accessor :precision, :date, :description, :payment_period, 
-			:payment_received
+			:payment_received, :currency
 		def Invoice.sum(key)
 			define_method(key) {
 				@items.inject(0.0) { |value, item| value + item.send(key) }
