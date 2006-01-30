@@ -22,7 +22,12 @@ module YDIM
 				}
 				__wrap(res)
 			else
-				__wrap(@obj.__send__(sym, *args))
+				res = @obj.__send__(sym, *args)
+				if(res.is_a?(Array))
+					res.collect { |item| __wrap(item) }
+				else
+					__wrap(res)
+				end
 			end
 		end
 		def __wrap(obj)
