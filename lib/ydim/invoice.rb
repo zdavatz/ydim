@@ -7,6 +7,17 @@ require 'ydim/item'
 
 module YDIM
 	class Invoice
+		class Info
+			KEYS = [:unique_id, :date, :description, :payment_received, :currency,
+				:payment_status, :debitor_name, :debitor_email, :debitor_id, :due_date,
+				:total_netto, :total_brutto ]
+			attr_reader *KEYS
+			def initialize(invoice)
+				KEYS.each { |key|
+					instance_variable_set("@#{key}", invoice.send(key))
+				}
+			end
+		end
 		attr_reader :unique_id, :debitor, :items
 		attr_accessor :precision, :date, :description, :payment_period, 
 			:payment_received, :currency
@@ -34,10 +45,22 @@ module YDIM
 			end
 			@debitor = debitor
 		end
+		def debitor_email
+			@debitor.email if(@debitor)
+		end
+		def debitor_id
+			@debitor.unique_id if(@debitor)
+		end
+		def debitor_name
+			@debitor.name if(@debitor)
+		end
 		def due_date
 			if(@date && !@payment_received)
 				@date + @payment_period.to_i
 			end
+		end
+		def info
+			Info.new(self)
 		end
 		def item(index)
 			@items.find { |item| item.index == index }

@@ -41,6 +41,11 @@ module YDIM
 		def invoice(unique_id)
 			@invoices.find { |invoice| invoice.unique_id == unique_id }
 		end
+		def invoice_infos(status)
+			@invoices.select { |inv| 
+				inv.payment_status == status 
+			}.collect { |inv| inv.info }
+		end
 		def next_invoice_date
 			@hosting_invoice_date
 		end

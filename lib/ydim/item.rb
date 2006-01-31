@@ -4,7 +4,7 @@
 module YDIM
 	class Item
 		DATA_KEYS = [ :data, :expiry_time, :item_type, :price, :quantity, :text,
-			:time, :unit, :vat_rate, ]
+			:time, :unit, :vat_rate ]
 		attr_accessor :index, *DATA_KEYS
 		def initialize(data={})
 			update(data)

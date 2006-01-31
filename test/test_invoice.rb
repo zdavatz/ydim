@@ -79,5 +79,9 @@ module YDIM
 			@invoice.payment_received = true
 			assert_equal('ps_paid', @invoice.payment_status)
 		end
+		def test_info
+			info = @invoice.info
+			assert_instance_of(Invoice::Info, info)
+		end
 	end
 end

@@ -84,6 +84,11 @@ module YDIM
 		def invoices
 			@serv.invoices.values
 		end
+		def invoice_infos(status=nil)
+			@serv.invoices.values.select { |inv| 
+				inv.payment_status == status 
+			}.collect { |inv| inv.info }
+		end
 		def search_debitors(email_or_name)
 			@serv.debitors.by_email(email_or_name) |
 				@serv.debitors.by_name(email_or_name)
