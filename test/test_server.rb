@@ -14,10 +14,11 @@ module YDIM
 		def setup
 			@config = FlexMock.new
 			@config.mock_handle(:autoinvoice_hour) { nil }
+			@config.mock_handle(:currency_update_hour) { nil }
 			@logger = FlexMock.new
 			@server = Server.new(@config, @logger)
 			@needle = @server.instance_variable_get('@serv')
-			@datadir = File.expand_path('data', File.dirname(__FILE__))
+			@datadir = File.expand_path('tmp', File.dirname(__FILE__))
 		end
 		def test_config
 			assert_equal(@config, @needle.config)

@@ -20,7 +20,8 @@ module YDIM
 		def assert_logged(*levels, &block)
 			logger = FlexMock.new
 			levels.uniq.each { |level|
-				logger.mock_handle(level, (levels & [level]).size) { assert(true) }
+				logger.mock_handle(level, levels.select { |l| l == level}.size) { 
+					assert(true) }
 			}
 			@user.mock_handle(:unique_id) { 'user' }
 			@serv.mock_handle(:logger) { logger }
@@ -54,7 +55,7 @@ module YDIM
 			invoice.mock_handle(:items) { added_items }
 			invoice.mock_handle(:odba_store, 1) {}
 			retval = nil
-			assert_logged(:debug) { 
+			assert_logged(:debug, :debug) { 
 				retval = @session.add_items(123, items) 
 			}
 			assert_equal(added_items, retval)
@@ -87,7 +88,7 @@ module YDIM
 			debitors = {}
 			@serv.mock_handle(:factory) { factory }
 			@serv.mock_handle(:debitors) { debitors }
-			assert_logged(:debug, :error) {
+			assert_logged(:debug, :debug, :error) {
 				assert_raises(IndexError) { @session.create_invoice(2) }
 			}
 			debitor = FlexMock.new
@@ -103,13 +104,15 @@ module YDIM
 		def test_debitor
 			debitors = {}
 			@serv.mock_handle(:debitors) { debitors }
-			assert_logged(:error) {
+			assert_logged(:debug, :error) {
 				assert_raises(IndexError) { @session.debitor(1) }
 			}
 			debitor = FlexMock.new
 			debitors.store(1, debitor)
-			assert_equal(debitor, @session.debitor(1))
-			assert_logged(:error) {
+			assert_logged(:debug) { 
+				assert_equal(debitor, @session.debitor(1))
+			}
+			assert_logged(:debug, :error) {
 				assert_raises(IndexError) { @session.debitor(2) }
 			}
 		end
@@ -131,7 +134,7 @@ module YDIM
 			invoice.mock_handle(:items) { items }
 			invoice.mock_handle(:odba_store, 1) {}
 			retval = nil
-			assert_logged(:debug) {
+			assert_logged(:debug, :debug) {
 				retval = @session.delete_item(3, 1)
 			}
 			assert_equal([item1,item3], retval)
@@ -151,12 +154,18 @@ module YDIM
 				res.push(debitor) if(name == 'ywesee GmbH')
 				res
 			}
-			assert_equal([], @session.search_debitors('Unknown Name'))
-			assert_equal([], @session.search_debitors('unknown@ywesee.com'))
-			assert_equal([debitor], @session.search_debitors('ywesee GmbH'))
-			assert_equal([debitor], @session.search_debitors('test@ywesee.com'))
-		end
-		def test_update_item
+			assert_logged(:debug) {
+				assert_equal([], @session.search_debitors('Unknown Name'))
+			}
+			assert_logged(:debug) {
+				assert_equal([], @session.search_debitors('unknown@ywesee.com'))
+			}
+			assert_logged(:debug) {
+				assert_equal([debitor], @session.search_debitors('ywesee GmbH'))
+			}
+			assert_logged(:debug) {
+				assert_equal([debitor], @session.search_debitors('test@ywesee.com'))
+			}
 		end
 	end
 end

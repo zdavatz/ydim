@@ -7,6 +7,8 @@ require 'odba/id_server'
 require 'rrba/server'
 require 'ydim/autoinvoicer'
 require 'ydim/client'
+require 'ydim/currency_converter'
+require 'ydim/currency_updater'
 require 'ydim/debitors'
 require 'ydim/factory'
 require 'ydim/root_user'
@@ -35,6 +37,11 @@ module YDIM
 			@serv.register(:config) {
 				config
 			}
+			@serv.register(:currency_converter) {
+				ODBA.cache.fetch_named('currency_converter', self) { 
+					CurrencyConverter.new	
+				}
+			}
 			@serv.register(:debitors) {
 				ODBA.cache.fetch_named('companies', self) {
 					Debitors.new
@@ -49,15 +56,24 @@ module YDIM
 				}
 			}
 			@serv.register(:invoices) {
-				ODBA.cache.fetch_named('invoices', self) {
-					{}
-				}
+				ODBA.cache.fetch_named('invoices', self) { {} }
 			}
 			@serv.register(:logger) {
 				logger
 			}
-			if(config.autoinvoice_hour)
-				run_autoinvoice_thread
+			if(hour = config.autoinvoice_hour)
+				repeat_at(hour, 'AutoInvoicer') {
+					AutoInvoicer.new(@serv).run
+				}
+			end
+			if(hour = config.currency_update_hour)
+				if(@serv.currency_converter.known_currencies \
+					 < @serv.config.currencies.size)
+					CurrencyUpdater.new(@serv).run
+				end
+				repeat_at(hour, 'CurrencyUpdater') {
+					CurrencyUpdater.new(@serv).run
+				}
 			end
 			@sessions = []
 		end
@@ -83,24 +99,23 @@ module YDIM
 			true
 		end
 		private
-		def run_autoinvoice_thread
+		def repeat_at(hour, thread_name)
 			@autoinvoicer = Thread.new { 
 				Thread.current.abort_on_exception = true
 				loop {
 					now = Time.now
-					next_run = Time.local(now.year, now.month, now.day,
-																@serv.config.autoinvoice_hour)
+					next_run = Time.local(now.year, now.month, now.day, hour)
 					sleepy_time = next_run - now
 					if(sleepy_time < 0)
 						sleepy_time += SECONDS_IN_DAY
 						next_run += SECONDS_IN_DAY
 					end
-					@serv.logger.info('AutoInvoicer') {
+					@serv.logger.info(thread_name) {
 						sprintf("next run %s, sleeping %i seconds", 
 										next_run.strftime("%c"), sleepy_time)
 					}
 					sleep(sleepy_time)
-					AutoInvoicer.new(@serv).run
+					yield
 				}
 			}
 		end

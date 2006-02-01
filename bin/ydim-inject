@@ -24,7 +24,9 @@ DRb.start_service
 
 client.login(server, key)
 invoice = client.create_invoice(data['debitor'])
-invoice.description = data['description'] || 'Auto-Invoice'
+invoice.currency = data['currency'] || config.currency
+invoice.description = data['description'] || config.invoice_description
+invoice.payment_period = data['payment_period'] || config.payment_period
 invoice.date = Date.today
 client.add_items(invoice.unique_id, data['items'])
 client.send_invoice(invoice.unique_id)

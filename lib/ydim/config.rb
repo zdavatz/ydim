@@ -13,10 +13,13 @@ module YDIM
 			'/etc/ydim/ydim.yml',
 		]
 		defaults = {
-			'config'					=> default_config_files,
-			'private_key'			=> File.join(home_dir, '.ssh', 'id_dsa'),
-			'user'						=> nil,
-			'server_url'			=> 'druby://localhost:12375', 
+			'config'							=> default_config_files,
+			'private_key'					=> File.join(home_dir, '.ssh', 'id_dsa'),
+			'user'								=> nil,
+			'server_url'					=> 'druby://localhost:12375', 
+			'currency'						=> 'EUR',
+			'invoice_description'	=> 'Auto-Invoice',
+			'payment_period'			=> 30,
 		}
 		config = RCLConf::RCLConf.new(ARGV, defaults)
 		config.load(config.config)

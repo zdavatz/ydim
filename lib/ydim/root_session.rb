@@ -51,13 +51,19 @@ module YDIM
 			debitor.odba_store
 			debitor.hosting_items
 		end
+		def currency_converter
+			@serv.logger.debug(whoami) { "currency_converter" }
+			@serv.currency_converter.drb_dup
+		end
 		def debitor(debitor_id)
+			@serv.logger.debug(whoami) { "debitor #{debitor_id}" }
 			@serv.debitors.fetch(debitor_id)
 		rescue IndexError
 			@serv.logger.error(whoami) { "invalid debitor_id: #{debitor_id}" }
 			raise
 		end
 		def debitors
+			@serv.logger.debug(whoami) { "debitors" }
 			@serv.debitors.values
 		end
 		def delete_hosting_item(debitor_id, index)
@@ -76,20 +82,24 @@ module YDIM
 			invoice.items
 		end
 		def invoice(invoice_id)
+			@serv.logger.debug(whoami) { "invoice #{invoice_id}" }
 			@serv.invoices.fetch(invoice_id)
 		rescue IndexError
 			@serv.logger.error(whoami) { "invalid invoice_id: #{invoice_id}" }
 			raise
 		end
 		def invoices
+			@serv.logger.debug(whoami) { "invoices" }
 			@serv.invoices.values
 		end
 		def invoice_infos(status=nil)
+			@serv.logger.debug(whoami) { "invoice_infos(#{status})" }
 			@serv.invoices.values.select { |inv| 
 				inv.payment_status == status 
 			}.collect { |inv| inv.info }
 		end
 		def search_debitors(email_or_name)
+			@serv.logger.debug(whoami) { "search_debitors(#{email_or_name})" }
 			@serv.debitors.by_email(email_or_name) |
 				@serv.debitors.by_name(email_or_name)
 		end

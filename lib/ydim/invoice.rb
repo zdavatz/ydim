@@ -11,7 +11,7 @@ module YDIM
 			KEYS = [:unique_id, :date, :description, :payment_received, :currency,
 				:payment_status, :debitor_name, :debitor_email, :debitor_id, :due_date,
 				:total_netto, :total_brutto ]
-			attr_reader *KEYS
+			attr_accessor *KEYS
 			def initialize(invoice)
 				KEYS.each { |key|
 					instance_variable_set("@#{key}", invoice.send(key))
