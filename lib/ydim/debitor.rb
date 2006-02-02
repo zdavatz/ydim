@@ -43,7 +43,7 @@ module YDIM
 		end
 		def invoice_infos(status)
 			@invoices.select { |inv| 
-				inv.payment_status == status 
+				inv.status == status 
 			}.collect { |inv| inv.info }
 		end
 		def next_invoice_date

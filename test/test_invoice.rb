@@ -70,14 +70,16 @@ module YDIM
 			assert_equal(23, pdf.invoice_number)
 			assert_equal('description', pdf.description)
 		end
-		def test_payment_status
+		def test_status
 			@invoice.date = Date.today
-			assert_equal('ps_open', @invoice.payment_status)
+			assert_equal('is_open', @invoice.status)
 			@invoice.date -= 2
 			@invoice.payment_period = 1
-			assert_equal('ps_due', @invoice.payment_status)
+			assert_equal('is_due', @invoice.status)
 			@invoice.payment_received = true
-			assert_equal('ps_paid', @invoice.payment_status)
+			assert_equal('is_paid', @invoice.status)
+			@invoice.deleted = true
+			assert_equal('is_trash', @invoice.status)
 		end
 		def test_info
 			info = @invoice.info

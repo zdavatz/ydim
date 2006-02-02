@@ -9,8 +9,8 @@ module YDIM
 	class Invoice
 		class Info
 			KEYS = [:unique_id, :date, :description, :payment_received, :currency,
-				:payment_status, :debitor_name, :debitor_email, :debitor_id, :due_date,
-				:total_netto, :total_brutto ]
+				:status, :debitor_name, :debitor_email, :debitor_id, :due_date,
+				:total_netto, :total_brutto, :deleted ]
 			attr_accessor *KEYS
 			def initialize(invoice)
 				KEYS.each { |key|
@@ -20,7 +20,7 @@ module YDIM
 		end
 		attr_reader :unique_id, :debitor, :items
 		attr_accessor :precision, :date, :description, :payment_period, 
-			:payment_received, :currency
+			:payment_received, :currency, :deleted
 		def Invoice.sum(key)
 			define_method(key) {
 				@items.inject(0.0) { |value, item| value + item.send(key) }
@@ -65,14 +65,16 @@ module YDIM
 		def item(index)
 			@items.find { |item| item.index == index }
 		end
-		def payment_status
-			if(@payment_received)
-				'ps_paid'
+		def status
+			if(@deleted)
+				'is_trash'
+			elsif(@payment_received)
+				'is_paid'
 			elsif(@date && @payment_period \
 						&& ((@date + @payment_period) < Date.today))
-				'ps_due'
+				'is_due'
 			else
-				'ps_open'
+				'is_open'
 			end
 		end
 		def pdf_invoice
