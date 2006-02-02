@@ -26,6 +26,17 @@ module YDIM
 			invoice.odba_store
 			invoice.items
 		end
+		def collect_garbage
+			@serv.logger.info(whoami) { "collect_garbage" }
+			deleted = []
+			@serv.invoices.each_value { |inv|
+				if(inv.deleted)
+					deleted.push(inv.info)
+					inv.odba_delete
+				end
+			}
+			deleted unless(deleted.empty?)
+		end
 		def create_debitor
 			@serv.logger.info(whoami) { "create_debitor" }
 			ODBA.transaction {
