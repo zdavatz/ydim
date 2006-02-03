@@ -28,7 +28,7 @@ module YDIM
 				hosting_invoice(debitor)
 			end
 		end
-		def hosting_invoice(debitor, date = Date.today)
+		def hosting_invoice(debitor, date = debitor.hosting_invoice_date)
 			price = debitor.hosting_price.to_f
 			if(price > 0 && (intvl = debitor.hosting_invoice_interval))
 				months = intvl.to_s[/\d+$/].to_i
@@ -53,6 +53,7 @@ module YDIM
 					invoice = @serv.factory.create_invoice(debitor) { |inv|
 						inv.date = date
 						inv.description = description
+						inv.precision = 2
 						inv.add_item(item)
 						debitor.hosting_items.each { |templ|
 							data.update({
@@ -63,6 +64,9 @@ module YDIM
 							inv.add_item(Item.new(data))
 						}
 					}
+					debitor.hosting_invoice_date = expdate
+					debitor.odba_store
+					invoice
 				}
 			end
 		end
@@ -70,8 +74,6 @@ module YDIM
 			idate = debitor.hosting_invoice_date
 			if(date == idate && (invoice = hosting_invoice(debitor, date)))
 				Mail.send_invoice(@serv.config, invoice) 
-				debitor.hosting_invoice_date = expdate
-				debitor.odba_store
 			end
 		end
 	end

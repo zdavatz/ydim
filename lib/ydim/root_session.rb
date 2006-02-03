@@ -94,7 +94,7 @@ module YDIM
 			invoice.items
 		end
 		def generate_invoice(debitor_id)
-			@serv.logger.info(whoami) { "generate(#{debitor_id})" }
+			@serv.logger.info(whoami) { "generate_invoice(#{debitor_id})" }
 			debitor = debitor(debitor_id)
 			AutoInvoicer.new(@serv).generate(debitor)
 		end
