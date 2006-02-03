@@ -16,11 +16,13 @@ module YDIM
 			@debitor.name = 'Name'
 			@debitor.contact = 'Contact'
 			@debitor.contact_firstname = 'Firstname'
+			@debitor.contact_title = 'Title'
 			@debitor.address_lines = %w{Line1 Line2}
 			@debitor.email = 'Email'
 			expected = [
 				'Name',
 				'z.H. Firstname Contact',
+				'Title', 
 				'Line1',
 				'Line2',
 				'Email',
