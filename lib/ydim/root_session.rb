@@ -2,6 +2,7 @@
 # RootSession -- ydim -- 10.01.2006 -- hwyss@ywesee.com
 
 require 'drb'
+require 'ydim/autoinvoicer'
 require 'ydim/debitor'
 require 'ydim/invoice'
 require 'ydim/item'
@@ -91,6 +92,11 @@ module YDIM
 			invoice.items.delete_if { |item| item.index == index }
 			invoice.odba_store
 			invoice.items
+		end
+		def generate_invoice(debitor_id)
+			@serv.logger.info(whoami) { "generate(#{debitor_id})" }
+			debitor = debitor(debitor_id)
+			AutoInvoicer.new(@serv).generate(debitor)
 		end
 		def invoice(invoice_id)
 			@serv.logger.debug(whoami) { "invoice #{invoice_id}" }

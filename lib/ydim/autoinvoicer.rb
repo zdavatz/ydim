@@ -22,11 +22,15 @@ module YDIM
 				invoice_hosting(debitor)
 			end
 		end
-		def invoice_hosting(debitor, date = Date.today)
-			idate = debitor.hosting_invoice_date
+		def generate(debitor)
+			case debitor.debitor_type
+			when 'dt_hosting'
+				hosting_invoice(debitor)
+			end
+		end
+		def hosting_invoice(debitor, date = Date.today)
 			price = debitor.hosting_price.to_f
-			if(date == idate && price > 0 \
-				 && (intvl = debitor.hosting_invoice_interval))
+			if(price > 0 && (intvl = debitor.hosting_invoice_interval))
 				months = intvl.to_s[/\d+$/].to_i
 				expdate = (date >> months)
 				invoice_interval = sprintf("%s-%s", date.strftime('%d.%m.%Y'), 
@@ -59,10 +63,15 @@ module YDIM
 							inv.add_item(Item.new(data))
 						}
 					}
-					Mail.send_invoice(@serv.config, invoice) 
-					debitor.hosting_invoice_date = expdate
-					debitor.odba_store
 				}
+			end
+		end
+		def invoice_hosting(debitor, date = Date.today)
+			idate = debitor.hosting_invoice_date
+			if(date == idate && (invoice = hosting_invoice(debitor, date)))
+				Mail.send_invoice(@serv.config, invoice) 
+				debitor.hosting_invoice_date = expdate
+				debitor.odba_store
 			end
 		end
 	end
