@@ -15,11 +15,12 @@ module YDIM
 		def test_address
 			@debitor.name = 'Name'
 			@debitor.contact = 'Contact'
+			@debitor.contact_firstname = 'Firstname'
 			@debitor.address_lines = %w{Line1 Line2}
 			@debitor.email = 'Email'
 			expected = [
 				'Name',
-				'z.H. Contact',
+				'z.H. Firstname Contact',
 				'Line1',
 				'Line2',
 				'Email',

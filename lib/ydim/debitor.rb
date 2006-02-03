@@ -6,8 +6,8 @@ require 'ydim/item'
 module YDIM
 	class Debitor
 		attr_reader :unique_id, :invoices, :hosting_items
-		attr_accessor :email, :name, :contact, :address_lines, :location,
-			:debitor_type, :hosting_price, :hosting_invoice_interval, 
+		attr_accessor :email, :name, :contact, :contact_firstname, :address_lines,
+			:location, :debitor_type, :hosting_price, :hosting_invoice_interval,
 			:hosting_invoice_date, :salutation
 		def initialize(unique_id)
 			@unique_id = unique_id
@@ -26,7 +26,8 @@ module YDIM
 		end
 		def address
 			lns = [@name]
-			lns.push(["z.H.", @salutation, @contact].compact.join(' '))
+			lns.push(["z.H.", @salutation, 
+							 @contact_firstname, @contact].compact.join(' '))
 			lns.concat(@address_lines)
 			lns.push(@location, @email)
 			lns.compact!
