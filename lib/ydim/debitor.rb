@@ -8,7 +8,7 @@ module YDIM
 		attr_reader :unique_id, :invoices, :hosting_items
 		attr_accessor :address_lines, :contact, :contact_firstname, :contact_title,
 			:debitor_type, :email, :hosting_invoice_date, :hosting_invoice_interval,
-			:hosting_price, :location, :name, :salutation
+			:hosting_price, :location, :name, :salutation, :phone
 		def initialize(unique_id)
 			@unique_id = unique_id
 			@address_lines = []
