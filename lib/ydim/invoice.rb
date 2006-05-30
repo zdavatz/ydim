@@ -29,7 +29,7 @@ module YDIM
 		def initialize(unique_id)
 			@unique_id = unique_id
 			@items = []
-			@precision = 0
+			@precision = 2
 		end
 		def add_item(item)
 			item.index = next_item_id
