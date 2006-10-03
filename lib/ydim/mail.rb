@@ -23,6 +23,8 @@ module YDIM
 			header.subject = subject
 			tpart = RMail::Message.new
 			mpart.add_part(tpart)
+			tpart.header.add('Content-Type', 'text/plain', nil, 
+                       'charset' => config.mail_charset)
 			tpart.body = body(config, debitor, invoice)
 			fpart = RMail::Message.new
 			mpart.add_part(fpart)
