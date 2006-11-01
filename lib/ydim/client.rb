@@ -9,6 +9,7 @@ module YDIM
 		attr_reader :session
 		def initialize(config)
 			@config = config
+			DRb.start_service(config.client_url)
 		end
 		def login(server, private_key)
 			@server = server

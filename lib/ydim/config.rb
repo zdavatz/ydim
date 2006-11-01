@@ -13,6 +13,7 @@ module YDIM
 			'/etc/ydim/ydim.yml',
 		]
 		defaults = {
+			'client_url'					=> 'druby://localhost:0',
 			'config'							=> default_config_files,
 			'private_key'					=> File.join(home_dir, '.ssh', 'id_dsa'),
 			'user'								=> nil,
