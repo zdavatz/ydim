@@ -62,6 +62,9 @@ module YDIM
 				@date + @payment_period.to_i
 			end
 		end
+    def empty?
+      @items.empty?
+    end
 		def info
 			Info.new(self)
 		end

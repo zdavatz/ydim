@@ -20,11 +20,13 @@ module YDIM
       today = Date.today
       next_month = today >> 1
       debitor.autoinvoices.each { |auto|
-        case auto.date
-        when today
-				  Mail.send_invoice(@serv.config, generate(auto)) 
-        when next_month
-          Mail.send_reminder(@serv.config, auto)
+        if(auto.total_netto > 0)
+          case auto.date
+          when today
+            Mail.send_invoice(@serv.config, generate(auto)) 
+          when next_month
+            Mail.send_reminder(@serv.config, auto)
+          end
         end
       }
 		end

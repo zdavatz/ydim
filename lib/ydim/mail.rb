@@ -45,8 +45,9 @@ module YDIM
 			recipients
 		end
     def Mail.send_reminder(config, autoinvoice)
-      if((subject = autoinvoice.reminder_subject) \
-         && (body = autoinvoice.reminder_body))
+      subject = autoinvoice.reminder_subject.to_s.strip
+      body = autoinvoice.reminder_body.to_s.strip
+      unless(subject.empty? || body.empty?)
         debitor = autoinvoice.debitor
         to = debitor.email
         mpart = RMail::Message.new
