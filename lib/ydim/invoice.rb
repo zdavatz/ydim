@@ -103,7 +103,7 @@ module YDIM
 		include ItemId
 	end
   class AutoInvoice < Invoice
-    attr_accessor :invoice_interval
+    attr_accessor :invoice_interval, :reminder_body, :reminder_subject
     def invoice_key
       :autoinvoice
     end

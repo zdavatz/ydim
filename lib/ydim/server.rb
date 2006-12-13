@@ -77,6 +77,7 @@ module YDIM
 			end
 			@sessions = []
       migrate_hosting_items
+      AutoInvoicer.new(@serv).run
 		end
 		def login(client, name=nil, &block)
 			@serv.logger.debug(client.__drburi) { 'attempting login' }

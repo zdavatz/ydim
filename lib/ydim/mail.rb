@@ -21,6 +21,7 @@ module YDIM
 			header.to = to
 			header.from = config.mail_from
 			header.subject = subject
+      header.date = Time.now
 			tpart = RMail::Message.new
 			mpart.add_part(tpart)
 			tpart.header.add('Content-Type', 'text/plain', nil, 
@@ -42,6 +43,30 @@ module YDIM
 				}
 			}
 			recipients
+		end
+    def Mail.send_reminder(config, autoinvoice)
+      if((subject = autoinvoice.reminder_subject) \
+         && (body = autoinvoice.reminder_body))
+        debitor = autoinvoice.debitor
+        to = debitor.email
+        mpart = RMail::Message.new
+        header = mpart.header
+        header.to = to
+        header.from = config.mail_from
+        header.subject = subject
+        header.date = Time.now
+        header.add('Content-Type', 'text/plain', nil, 
+                   'charset' => config.mail_charset)
+        mpart.body = body
+        smtp = Net::SMTP.new(config.smtp_server)
+        recipients = config.mail_recipients.dup.push(to).uniq
+        smtp.start {
+          recipients.each { |recipient|
+            smtp.sendmail(mpart.to_s, config.smtp_from, recipient)
+          }
+        }
+        recipients
+      end
 		end
 	end
 end
