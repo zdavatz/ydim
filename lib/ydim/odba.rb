@@ -19,4 +19,7 @@ module YDIM
 		include ODBA::Persistable
 		ODBA_SERIALIZABLE = ['@items']
 	end
+	class AutoInvoice
+    odba_index :unique_id
+	end
 end

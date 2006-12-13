@@ -15,11 +15,11 @@ module YDIM
 		def initialize(user)
 			@user = user
 		end
-		def add_items(invoice_id, items)
+		def add_items(invoice_id, items, invoice_key=:invoice)
 			@serv.logger.debug(whoami) { 
 				size = (items.respond_to?(:size)) ? items.size : nil
-				"add_items(#{invoice_id}, #{items.class}[#{size}])" }
-			invoice = invoice(invoice_id)
+				"add_items(#{invoice_id}, #{items.class}[#{size}], #{invoice_key})" }
+			invoice = self.send(invoice_key, invoice_id)
 			items.each { |data|
 				item = Item.new({:vat_rate => @serv.config.vat_rate}.update(data))
 				invoice.add_item(item)
@@ -27,6 +27,15 @@ module YDIM
 			invoice.odba_store
 			invoice.items
 		end
+    def autoinvoice(invoice_id)
+      @serv.logger.debug(whoami) { "autoinvoice #{invoice_id}" }
+      AutoInvoice.find_by_unique_id(invoice_id.to_s) \
+      or begin
+        msg = "invalid invoice_id: #{invoice_id}"
+        @serv.logger.error(whoami) { msg }
+        raise IndexError, msg
+      end
+    end
 		def collect_garbage
 			@serv.logger.info(whoami) { "collect_garbage" }
 			deleted = []
@@ -38,6 +47,12 @@ module YDIM
 			}
 			deleted unless(deleted.empty?)
 		end
+    def create_autoinvoice(debitor_id)
+      @serv.logger.debug(whoami) { "create_autoinvoice(#{debitor_id})" }
+      ODBA.transaction {
+        @serv.factory.create_autoinvoice(debitor(debitor_id))
+      }
+    end
 		def create_debitor
 			@serv.logger.info(whoami) { "create_debitor" }
 			ODBA.transaction {
@@ -78,6 +93,13 @@ module YDIM
 			@serv.logger.debug(whoami) { "debitors" }
 			@serv.debitors.values
 		end
+    def delete_autoinvoice(invoice_id)
+			@serv.logger.debug(whoami) { 
+				"delete_autoinvoice(#{invoice_id})" }
+      if(invoice = autoinvoice(invoice_id))
+        invoice.odba_delete
+      end
+    end
 		def delete_hosting_item(debitor_id, index)
 			@serv.logger.debug(whoami) { 
 				"delete_hosting_item(#{debitor_id}, #{index})" }
@@ -86,17 +108,18 @@ module YDIM
 			debitor.odba_store
 			debitor.hosting_items
 		end
-		def delete_item(invoice_id, index)
-			@serv.logger.debug(whoami) { "delete_item(#{invoice_id}, #{index})" }
-			invoice = invoice(invoice_id)
+		def delete_item(invoice_id, index, invoice_key=:invoice)
+			@serv.logger.debug(whoami) { 
+        "delete_item(#{invoice_id}, #{index}, #{invoice_key})" }
+			invoice = self.send(invoice_key, invoice_id)
 			invoice.items.delete_if { |item| item.index == index }
 			invoice.odba_store
 			invoice.items
 		end
-		def generate_invoice(debitor_id)
-			@serv.logger.info(whoami) { "generate_invoice(#{debitor_id})" }
-			debitor = debitor(debitor_id)
-			AutoInvoicer.new(@serv).generate(debitor)
+		def generate_invoice(invoice_id)
+			@serv.logger.info(whoami) { "generate_invoice(#{invoice_id})" }
+      invoice = autoinvoice(invoice_id)
+			AutoInvoicer.new(@serv).generate(invoice)
 		end
 		def invoice(invoice_id)
 			@serv.logger.debug(whoami) { "invoice #{invoice_id}" }
@@ -133,10 +156,10 @@ module YDIM
 			debitor.odba_store
 			item
 		end
-		def update_item(invoice_id, index, data)
+		def update_item(invoice_id, index, data, invoice_key=:invoice)
 			@serv.logger.debug(whoami) { 
 				"update_item(#{invoice_id}, #{index}, #{data.inspect})" }
-			invoice = invoice(invoice_id)
+			invoice = self.send(invoice_key, invoice_id)
 			item = invoice.item(index)
 			item.update(data)
 			invoice.odba_store

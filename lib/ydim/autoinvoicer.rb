@@ -17,45 +17,42 @@ module YDIM
 			}
 		end
 		def autoinvoice(debitor)
-			case debitor.debitor_type
-			when 'dt_hosting'
-				invoice_hosting(debitor)
-			end
+      today = Date.today
+      debitor.autoinvoices.each { |auto|
+        if(auto.date == today)
+				  Mail.send_invoice(@serv.config, generate(auto)) 
+        end
+      }
 		end
-		def generate(debitor)
-			case debitor.debitor_type
-			when 'dt_hosting'
-				hosting_invoice(debitor)
-			end
+		def generate(autoinvoice)
+      ODBA.transaction {
+        @serv.factory.generate_invoice(autoinvoice)
+      }
 		end
-		def hosting_invoice(debitor, date = debitor.hosting_invoice_date)
-			price = debitor.hosting_price.to_f
-			if(price > 0 && (intvl = debitor.hosting_invoice_interval))
+    ## migratory code
+		def hosting_autoinvoice(debitor, date=nil)
+      date = debitor.instance_variable_get('@hosting_invoice_date')
+      intvl = debitor.instance_variable_get('@hosting_invoice_interval')
+      items = debitor.instance_variable_get('@hosting_items')
+			price = debitor.instance_variable_get('@hosting_price').to_f
+			if(price > 0 && intvl && items)
 				months = intvl.to_s[/\d+$/].to_i
-				expdate = (date >> months)
-				invoice_interval = sprintf("%s-%s", date.strftime('%d.%m.%Y'), 
-																	 (expdate - 1).strftime('%d.%m.%Y'))
-				description = sprintf("Hosting %s", invoice_interval)
 				time = Time.now
-				expiry_time = Time.local(expdate.year, expdate.month, expdate.day)
+        description = 'Hosting'
 				data = {
 					:text				=>	description,
-					:item_type	=>	:hosting,
 					:quantity		=>	months,
 					:unit				=>	'Monate',
 					:price			=>	price.to_f,
-					:vat_rate		=>	@serv.config.vat_rate,
-					:time				=>	time,
-					:expiry_time=>	expiry_time
 				}
 				item = Item.new(data)
 				ODBA.transaction {
-					invoice = @serv.factory.create_invoice(debitor) { |inv|
+					invoice = @serv.factory.create_autoinvoice(debitor) { |inv|
 						inv.date = date
 						inv.description = description
 						inv.precision = 2
 						inv.add_item(item)
-						debitor.hosting_items.each { |templ|
+						items.each { |templ|
 							data.update({
 								:item_type=>	:domain_pointer,
 								:text			=>	"Domain-Pointer: #{templ.text}",
@@ -64,16 +61,10 @@ module YDIM
 							inv.add_item(Item.new(data))
 						}
 					}
-					debitor.hosting_invoice_date = expdate
+          debitor.add_autoinvoice(invoice)
 					debitor.odba_store
-					invoice
+          invoice
 				}
-			end
-		end
-		def invoice_hosting(debitor, date = Date.today)
-			idate = debitor.hosting_invoice_date
-			if(date == idate && (invoice = hosting_invoice(debitor, date)))
-				Mail.send_invoice(@serv.config, invoice) 
 			end
 		end
 	end

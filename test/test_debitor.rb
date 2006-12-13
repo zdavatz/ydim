@@ -9,6 +9,7 @@ require 'flexmock'
 
 module YDIM
 	class TestDebitor < Test::Unit::TestCase
+    include FlexMock::TestCase
 		def setup
 			@debitor = Debitor.new(1)
 		end
@@ -51,6 +52,23 @@ module YDIM
 			date = Date.today + 1
 			@debitor.hosting_invoice_date = date
 			assert_equal(date, @debitor.next_invoice_date)
+		end
+		def test_add_autoinvoice
+			invoice = flexmock('autoinvoice')
+			invoice.should_receive(:unique_id).and_return(17)
+			retval = @debitor.add_autoinvoice(invoice)
+			assert_equal(invoice, retval)
+			assert_equal([invoice], @debitor.autoinvoices)
+			assert_equal(invoice, @debitor.autoinvoice(17))
+		end
+		def test_delete_autoinvoice
+			invoice = flexmock('autoinvoice')
+			invoice.should_receive(:unique_id).and_return(17)
+			@debitor.autoinvoices.push(invoice)
+			retval = @debitor.delete_autoinvoice(invoice)
+			assert_equal(invoice, retval)	
+			assert_equal([], @debitor.autoinvoices)
+			assert_nil(@debitor.delete_autoinvoice(invoice))
 		end
 	end
 end

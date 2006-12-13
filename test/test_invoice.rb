@@ -86,4 +86,23 @@ module YDIM
 			assert_instance_of(Invoice::Info, info)
 		end
 	end
+  class TestAutoInvoice < Test::Unit::TestCase
+		def setup
+			@invoice = AutoInvoice.new(23)
+		end
+    def test_advance
+      today = Date.today
+      retval = @invoice.advance(today)
+      assert_equal(today, @invoice.date)
+      assert_equal(@invoice.date, retval)
+      @invoice.invoice_interval = "inv_3"
+      retval = @invoice.advance(today)
+      assert_equal(today >> 3, @invoice.date)
+      assert_equal(@invoice.date, retval)
+      @invoice.invoice_interval = "inv_12"
+      retval = @invoice.advance(today - 2)
+      assert_equal((today - 2) >> 12, @invoice.date)
+      assert_equal(@invoice.date, retval)
+    end
+  end
 end

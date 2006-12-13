@@ -31,6 +31,9 @@ module YDIM
 			@items = []
 			@precision = 2
 		end
+    def invoice_key
+      :invoice
+    end
 		def add_item(item)
 			item.index = next_item_id
 			@items.push(item)
@@ -38,10 +41,10 @@ module YDIM
 		end
 		def debitor=(debitor)
 			if(@debitor)
-				@debitor.delete_invoice(self)
+				@debitor.send("delete_#{invoice_key}", self)
 			end
 			if(debitor)
-				debitor.add_invoice(self)
+				debitor.send("add_#{invoice_key}", self)
 			end
 			@debitor = debitor
 		end
@@ -99,4 +102,13 @@ module YDIM
 		private
 		include ItemId
 	end
+  class AutoInvoice < Invoice
+    attr_accessor :invoice_interval
+    def invoice_key
+      :autoinvoice
+    end
+    def advance(date)
+      @date = date >> @invoice_interval.to_s[/\d+/].to_i
+    end
+  end
 end
