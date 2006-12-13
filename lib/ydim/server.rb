@@ -103,6 +103,10 @@ module YDIM
     def migrate_hosting_items
       invoicer = AutoInvoicer.new(@serv)
       @serv.debitors.each_value { |deb|
+        if(deb.autoinvoices.nil?)
+          deb.instance_variable_set('@autoinvoices', [])
+          deb.odba_store
+        end
         if(deb.debitor_type == 'dt_hosting' \
           && invoicer.hosting_autoinvoice(deb))
           deb.meta_eval { 
