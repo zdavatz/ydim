@@ -8,6 +8,7 @@ require 'rclconf'
 require 'drb'
 require 'fileutils'
 require 'odba/connection_pool'
+require 'odba/drbwrapper'
 
 $0 = __FILE__
 
@@ -53,6 +54,8 @@ config.load(config.config)
 ODBA.storage.dbi = ODBA::ConnectionPool.new(config.db_driver_url, 
 	config.db_user, config.db_auth)
 ODBA.cache.setup
+
+DRb.install_id_conv ODBA::DRbIdConv.new
 
 log_file = config.log_file
 if(log_file.is_a?(String))

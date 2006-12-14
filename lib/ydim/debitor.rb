@@ -54,7 +54,7 @@ module YDIM
 			}.collect { |inv| inv.info }
 		end
 		def next_invoice_date
-			@autoinvoices.collect { |inv| inv.date }.min
+			@autoinvoices.collect { |inv| inv.date }.compact.min
 		end
 		private
 		include ItemId
