@@ -47,6 +47,8 @@ module YDIM
     def Mail.send_reminder(config, autoinvoice)
       subject = autoinvoice.reminder_subject.to_s.strip
       body = autoinvoice.reminder_body.to_s.strip
+      body.gsub!(%r{<invoice>\s*}, '')
+      body.gsub!(%r{\s*</invoice>}, '')
       unless(subject.empty? || body.empty?)
         debitor = autoinvoice.debitor
         to = debitor.email

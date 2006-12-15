@@ -92,13 +92,26 @@ module YDIM
 			invoice.description = @description
 			invoice.debitor_address = @debitor.address
 			invoice.items = @items.collect { |item|
-				[ item.time, item.text, item.unit, item.quantity.to_f, item.price.to_f ]
-			}
+        [ item.time, item.text, item.unit, item.quantity.to_f,
+          item.price.to_f ] 
+      }
 			invoice
 		end
 		def to_pdf
 			pdf_invoice.to_pdf
 		end
+    def to_s
+      items = @items.collect { |item|
+        sprintf("%-32s %6i %-12s %9.2f %9.2f", item.text, item.quantity, 
+                item.unit, item.price.to_f, item.total_netto)
+      }.join("\n")
+      [
+        items, 
+        "Netto: %16.2f" % total_netto,
+        "MwSt.: %16.2f" % vat,
+        "Total: %16.2f" % total_brutto,
+      ].join("\n")
+    end
 		sum :total_brutto
 		sum :total_netto
 		sum :vat
