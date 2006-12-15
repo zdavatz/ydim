@@ -102,7 +102,8 @@ module YDIM
 		end
     def to_s
       @items.collect { |item|
-        sprintf("%s: %.2f exkl. MwSt.", item.text, item.total_netto)
+				sprintf("%04.2f * %s: %.2f exkl. MwSt.", item.quantity.to_f, item.text,
+								item.total_netto)
       }.join("\n")
     end
 		sum :total_brutto
