@@ -11,6 +11,7 @@ require 'flexmock'
 
 module YDIM
 	class TestRootSession < Test::Unit::TestCase
+    include FlexMock::TestCase
 		def setup
 			@user = FlexMock.new
 			@session = RootSession.new(@user)
@@ -18,15 +19,15 @@ module YDIM
 			@session.serv = @serv
 		end
 		def assert_logged(*levels, &block)
-			logger = FlexMock.new
+			@mock_logger = flexmock("logger")
 			levels.uniq.each { |level|
-				logger.mock_handle(level, levels.select { |l| l == level}.size) { 
-					assert(true) }
+				@mock_logger.should_receive(level).times(levels.select { |l| 
+          l == level}.size).and_return { assert(true) }
 			}
 			@user.mock_handle(:unique_id) { 'user' }
-			@serv.mock_handle(:logger) { logger }
+			@serv.mock_handle(:logger) { @mock_logger }
 			block.call
-			logger.mock_verify
+			@mock_logger.mock_verify
 		end
 		def test_add_items
 			config = FlexMock.new

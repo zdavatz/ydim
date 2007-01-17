@@ -76,7 +76,6 @@ module YDIM
 				}
 			end
 			@sessions = []
-      migrate_hosting_items
 		end
 		def login(client, name=nil, &block)
 			@serv.logger.debug(client.__drburi) { 'attempting login' }
@@ -100,28 +99,6 @@ module YDIM
 			true
 		end
 		private
-    def migrate_hosting_items
-      invoicer = AutoInvoicer.new(@serv)
-      @serv.debitors.each_value { |deb|
-        if(deb.autoinvoices.nil?)
-          deb.instance_variable_set('@autoinvoices', [])
-          deb.odba_store
-        end
-        if(deb.debitor_type == 'dt_hosting' \
-          && invoicer.hosting_autoinvoice(deb))
-          deb.meta_eval { 
-            define_method(:migrate_hosting_items) { 
-              remove_instance_variable('@hosting_invoice_date')
-              remove_instance_variable('@hosting_invoice_interval')
-              remove_instance_variable('@hosting_items')
-              remove_instance_variable('@hosting_price')
-            }
-          }
-          deb.migrate_hosting_items
-          deb.odba_store
-        end
-      }
-    end
 		def repeat_at(hour, thread_name)
 			@autoinvoicer = Thread.new { 
 				Thread.current.abort_on_exception = true

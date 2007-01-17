@@ -47,12 +47,6 @@ module YDIM
 			assert_equal([], @debitor.invoices)
 			assert_nil(@debitor.delete_invoice(invoice))
 		end
-		def test_next_invoice_date
-			assert_nil(@debitor.next_invoice_date)
-			date = Date.today + 1
-			@debitor.hosting_invoice_date = date
-			assert_equal(date, @debitor.next_invoice_date)
-		end
 		def test_add_autoinvoice
 			invoice = flexmock('autoinvoice')
 			invoice.should_receive(:unique_id).and_return(17)

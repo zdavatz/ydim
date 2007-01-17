@@ -100,12 +100,6 @@ module YDIM
 		def to_pdf
 			pdf_invoice.to_pdf
 		end
-    def to_s
-      @items.collect { |item|
-				sprintf("%04.2f * %s: %.2f exkl. MwSt.", item.quantity.to_f, item.text,
-								item.total_netto)
-      }.join("\n")
-    end
 		sum :total_brutto
 		sum :total_netto
 		sum :vat
