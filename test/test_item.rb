@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # TestItem -- ydim -- 12.01.2006 -- hwyss@ywesee.com
 
-
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
 require 'test/unit'

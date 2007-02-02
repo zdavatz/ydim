@@ -9,7 +9,6 @@ require 'ydim/autoinvoicer'
 require 'ydim/client'
 require 'ydim/currency_converter'
 require 'ydim/currency_updater'
-require 'ydim/debitors'
 require 'ydim/factory'
 require 'ydim/root_user'
 require 'ydim/util'
@@ -42,11 +41,6 @@ module YDIM
 					CurrencyConverter.new	
 				}
 			}
-			@serv.register(:debitors) {
-				ODBA.cache.fetch_named('companies', self) {
-					Debitors.new
-				}
-			}
 			@serv.register(:factory) {
 				Factory.new(@serv)
 			}
@@ -54,9 +48,6 @@ module YDIM
 				ODBA.cache.fetch_named('id_server', self) {
 					ODBA::IdServer.new
 				}
-			}
-			@serv.register(:invoices) {
-				ODBA.cache.fetch_named('invoices', self) { {} }
 			}
 			@serv.register(:logger) {
 				logger

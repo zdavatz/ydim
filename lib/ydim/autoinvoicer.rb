@@ -4,6 +4,8 @@
 require 'date'
 require 'pdfinvoice/config'
 require 'pdfinvoice/invoice'
+require 'odba/odba'
+require 'ydim/debitor'
 require 'ydim/mail'
 
 module YDIM
@@ -12,7 +14,7 @@ module YDIM
 			@serv = serv
 		end
 		def run
-			@serv.debitors.each_value { |debitor| 
+			Debitor.odba_extent { |debitor| 
 				autoinvoice(debitor)
 			}
 		end

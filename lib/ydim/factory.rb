@@ -23,8 +23,6 @@ module YDIM
 			invoice = Invoice.new(id)
 			yield(invoice) if(block_given?)
 			invoice.debitor = debitor
-			@serv.invoices.store(id, invoice)
-			@serv.invoices.odba_store
 			debitor.invoices.odba_store
 			invoice
 		end

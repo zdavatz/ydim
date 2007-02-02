@@ -9,6 +9,7 @@ require 'ydim/invoice'
 
 module YDIM
 	class TestInvoice < Test::Unit::TestCase
+    include FlexMock::TestCase
 		def setup
 			@invoice = Invoice.new(23)
 		end
@@ -27,6 +28,13 @@ module YDIM
 			assert_equal([item, item], @invoice.items)
 			assert_equal(item, retval)
 			item.mock_verify
+		end
+		def test_item
+			item = flexmock('item')
+			item.should_receive(:index).and_return(4)
+      @invoice.items.push(item)
+      assert_nil(@invoice.item(0))
+      assert_equal(item, @invoice.item(4))
 		end
 		def test_debitor_writer
 			debitor = FlexMock.new
@@ -85,6 +93,12 @@ module YDIM
 			info = @invoice.info
 			assert_instance_of(Invoice::Info, info)
 		end
+    def test_empty
+      assert_equal(true, @invoice.empty?)
+      item = flexmock('item')
+      @invoice.items.push(item)
+      assert_equal(false, @invoice.empty?)
+    end
 	end
   class TestAutoInvoice < Test::Unit::TestCase
 		def setup

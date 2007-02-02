@@ -27,5 +27,11 @@ module YDIM
 				@converter.convert(1, 'RND', 'CHF')	
 			}
 		end
+    def test_drb_dup
+			@converter.store('EUR', 'CHF', 1.55474)
+      dup = @converter.drb_dup
+      assert_instance_of(MobileCurrencyConverter, dup)
+      assert_equal(1.55474, dup.convert(1, 'EUR', 'CHF'))
+    end
 	end
 end

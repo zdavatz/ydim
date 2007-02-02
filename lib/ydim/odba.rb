@@ -14,10 +14,15 @@ module YDIM
 	class Debitor
 		include ODBA::Persistable
 		ODBA_SERIALIZABLE = ['@address_lines', '@hosting_items']
+    odba_index :email
+    odba_index :name
+    odba_index :unique_id
 	end
 	class Invoice
 		include ODBA::Persistable
 		ODBA_SERIALIZABLE = ['@items']
+    odba_index :status
+    odba_index :unique_id
 	end
 	class AutoInvoice
     odba_index :unique_id
