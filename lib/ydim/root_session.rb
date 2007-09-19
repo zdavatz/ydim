@@ -36,11 +36,11 @@ module YDIM
         raise IndexError, msg
       end
     end
-		def collect_garbage
+		def collect_garbage(debitor_id=nil)
 			@serv.logger.info(whoami) { "collect_garbage" }
 			deleted = []
       Invoice.odba_extent { |inv|
-				if(inv.deleted)
+				if([nil, inv.debitor_id].include?(debitor_id) && inv.deleted)
 					deleted.push(inv.info)
 					inv.odba_delete
 				end

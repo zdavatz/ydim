@@ -90,13 +90,33 @@ module YDIM
       inv1.should_receive(:info).and_return('info1')
       inv1.should_receive(:odba_delete).times(1)\
         .and_return { assert(true) }
+      inv1.should_receive(:debitor_id).and_return(2)
       inv2 = flexmock('Invoice2')
       inv2.should_receive(:deleted).and_return(false)
+      inv2.should_receive(:debitor_id).and_return(3)
       flexstub(Invoice).should_receive(:odba_extent)\
         .and_return { |blk| [inv1, inv2].each(&blk) }
       res = nil
       assert_logged(:info) {
         res = @session.collect_garbage
+      }
+      assert_equal(['info1'], res)
+    end
+    def test_collect_garbage__debitor
+      inv1 = flexmock('Invoice1')
+      inv1.should_receive(:deleted).and_return(true)
+      inv1.should_receive(:info).and_return('info1')
+      inv1.should_receive(:odba_delete).times(1)\
+        .and_return { assert(true) }
+      inv1.should_receive(:debitor_id).and_return(2)
+      inv2 = flexmock('Invoice2')
+      inv2.should_receive(:deleted).and_return(true)
+      inv2.should_receive(:debitor_id).and_return(3)
+      flexstub(Invoice).should_receive(:odba_extent)\
+        .and_return { |blk| [inv1, inv2].each(&blk) }
+      res = nil
+      assert_logged(:info) {
+        res = @session.collect_garbage(2)
       }
       assert_equal(['info1'], res)
     end
