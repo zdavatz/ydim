@@ -84,8 +84,9 @@ module YDIM
 			end
 		end
 		def pdf_invoice
-			config = PdfInvoice.config
+			config = PdfInvoice.config.dup
 			config.formats['quantity'] = "%1.#{@precision}f"
+      config.formats['total'] = "#{@currency} %1.2f"
 			invoice = PdfInvoice::Invoice.new(config)
 			invoice.date = @date
 			invoice.invoice_number = @unique_id
