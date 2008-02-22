@@ -6,6 +6,11 @@ require 'ydim/currency_converter'
 require 'ydim/debitor'
 require 'ydim/invoice'
 
+module ODBA
+  module Persistable
+    alias :save :odba_store
+  end
+end
 module YDIM
 	class CurrencyConverter
 		include ODBA::Persistable
