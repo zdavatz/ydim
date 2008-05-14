@@ -53,7 +53,7 @@ module YDIM
 				logger
 			}
 			if(hour = config.autoinvoice_hour)
-				repeat_at(hour, 'AutoInvoicer') {
+				@autoinvoicer = repeat_at(hour, 'AutoInvoicer') {
 					AutoInvoicer.new(@serv).run
 				}
 			end
@@ -62,7 +62,7 @@ module YDIM
 					 < @serv.config.currencies.size)
 					CurrencyUpdater.new(@serv).run
 				end
-				repeat_at(hour, 'CurrencyUpdater') {
+				@currency_updater = repeat_at(hour, 'CurrencyUpdater') {
 					CurrencyUpdater.new(@serv).run
 				}
 			end
@@ -91,7 +91,7 @@ module YDIM
 		end
 		private
 		def repeat_at(hour, thread_name)
-			@autoinvoicer = Thread.new { 
+			Thread.new { 
 				Thread.current.abort_on_exception = true
 				loop {
 					now = Time.now
