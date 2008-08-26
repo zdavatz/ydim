@@ -25,6 +25,10 @@ module YDIM
 	end
 	class Invoice
 		include ODBA::Persistable
+    class << self
+      alias :all :odba_extent
+    end
+    alias :save :odba_store
 		ODBA_SERIALIZABLE = ['@items']
     odba_index :status
     odba_index :unique_id

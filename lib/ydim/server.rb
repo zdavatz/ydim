@@ -66,6 +66,9 @@ module YDIM
 					CurrencyUpdater.new(@serv).run
 				}
 			end
+      @status_updater = repeat_at(1, 'StatusUpdater') {
+        Invoice.all { |inv| inv.save }
+      }
 			@sessions = []
 		end
 		def login(client, name=nil, &block)
