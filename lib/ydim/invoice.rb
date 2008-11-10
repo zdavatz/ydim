@@ -30,6 +30,7 @@ module YDIM
 			@unique_id = unique_id
 			@items = []
 			@precision = 2
+      @payment_period = 10
 		end
     def invoice_key
       :invoice

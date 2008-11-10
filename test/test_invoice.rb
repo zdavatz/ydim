@@ -55,6 +55,7 @@ module YDIM
 			debitor2.mock_verify
 		end
 		def test_due_date
+			@invoice.payment_period = nil
 			assert_nil(@invoice.due_date)
 			today = Date.today
 			@invoice.date = today
@@ -105,6 +106,7 @@ module YDIM
 			@invoice = AutoInvoice.new(23)
 		end
     def test_advance
+      assert_equal 10, @invoice.payment_period
       today = Date.today
       retval = @invoice.advance(today)
       assert_equal(today, @invoice.date)
@@ -117,6 +119,7 @@ module YDIM
       retval = @invoice.advance(today - 2)
       assert_equal((today - 2) >> 12, @invoice.date)
       assert_equal(@invoice.date, retval)
+      assert_equal 10, @invoice.payment_period
     end
   end
 end
