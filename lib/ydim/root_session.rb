@@ -20,8 +20,9 @@ module YDIM
 				size = (items.respond_to?(:size)) ? items.size : nil
 				"add_items(#{invoice_id}, #{items.class}[#{size}], #{invoice_key})" }
 			invoice = self.send(invoice_key, invoice_id)
+      rate = invoice.suppress_vat ? 0 : @serv.config.vat_rate
 			items.each { |data|
-				item = Item.new({:vat_rate => @serv.config.vat_rate}.update(data))
+				item = Item.new({:vat_rate => rate}.update(data))
 				invoice.add_item(item)
 			}
 			invoice.odba_store
