@@ -15,7 +15,49 @@ require 'ydim/util'
 
 module YDIM
 	class Server
-		SECONDS_IN_DAY = 24*60*60
+    ydim_default_dir = File.join(ENV['HOME'], '.ydim')
+    default_config_files = [
+      File.join(ydim_default_dir, 'ydimd.yml'),
+      '/etc/ydim/ydimd.yml',
+    ]
+    defaults = {
+      'autoinvoice_hour'      => 1,
+      'config'                => default_config_files,
+      'conf_dir'              => File.join(ydim_default_dir, 'conf'),
+      'currencies'            => ['CHF', 'EUR', 'USD'],
+      'currency_update_hour'  => 2,
+      'data_dir'              => File.join(ydim_default_dir, 'data'),
+      'server_url'            => 'druby://localhost:12375',
+      'db_driver_url'         => 'DBI:pg:ydim',
+      'db_user'               => 'ydim',
+      'db_auth'               => '',
+      'detach'                => false,
+      'invoice_number_start'  => 10000,
+      'log_level'             => 'INFO',
+      'log_file'              => STDOUT,
+      'mail_body'             => "%s %s\n%s",
+      'mail_charset'          => 'iso-8859-1',
+      'mail_from'             => '',
+      'mail_recipients'       => [],
+      'root_name'             => 'Root',
+      'root_email'            => '',
+      'root_key'              => 'root_dsa',
+      'salutation'            => {
+        ''                    =>  'Sehr geehrter Herr',
+        'Herr'                =>  'Sehr geehrter Herr',
+        'Frau'                =>  'Sehr geehrte Frau',
+      },
+      'smtp_from'             => '',
+      'smtp_server'           => 'localhost',
+      'vat_rate'              => 7.6,
+    }
+    config = RCLConf::RCLConf.new(ARGV, defaults)
+    config.load(config.config)
+    CONFIG = config
+    SECONDS_IN_DAY = 24*60*60
+    def Server.config
+      CONFIG
+    end
 		def initialize(config, logger)
 			@serv = Needle::Registry.new
 			@serv.register(:auth_server) { 

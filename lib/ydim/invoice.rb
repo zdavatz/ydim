@@ -10,7 +10,7 @@ module YDIM
 		class Info
 			KEYS = [:unique_id, :date, :description, :payment_received, :currency,
 				:status, :debitor_name, :debitor_email, :debitor_id, :due_date,
-				:total_netto, :total_brutto, :deleted ]
+				:total_netto, :total_brutto, :deleted, :suppress_vat ]
 			attr_accessor *KEYS
 			def initialize(invoice)
 				KEYS.each { |key|
@@ -18,7 +18,7 @@ module YDIM
 				}
 			end
 		end
-		attr_reader :unique_id, :debitor, :items
+		attr_reader :unique_id, :debitor, :items, :suppress_vat
 		attr_accessor :precision, :date, :description, :payment_period, 
 			:payment_received, :currency, :deleted
 		def Invoice.sum(key)
@@ -99,6 +99,11 @@ module YDIM
       }
 			invoice
 		end
+    def suppress_vat= bool
+      rate = bool ? 0 : Server.config.vat_rate
+      @items.each do |item| item.vat_rate = rate end
+      @suppres_vat = bool
+    end
 		def to_pdf
 			pdf_invoice.to_pdf
 		end
