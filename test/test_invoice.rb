@@ -108,18 +108,28 @@ module YDIM
     def test_advance
       assert_equal 10, @invoice.payment_period
       today = Date.today
+      subj = 'Reminder for <year>2008, 2009</year> and <year>2010</year>'
+      @invoice.reminder_subject = subj
       retval = @invoice.advance(today)
       assert_equal(today, @invoice.date)
       assert_equal(@invoice.date, retval)
+      assert_equal subj, @invoice.reminder_subject
       @invoice.invoice_interval = "inv_3"
       retval = @invoice.advance(today)
       assert_equal(today >> 3, @invoice.date)
       assert_equal(@invoice.date, retval)
+      assert_equal subj, @invoice.reminder_subject
       @invoice.invoice_interval = "inv_12"
       retval = @invoice.advance(today - 2)
       assert_equal((today - 2) >> 12, @invoice.date)
       assert_equal(@invoice.date, retval)
+      subj = 'Reminder for <year>2009, 2010</year> and <year>2011</year>'
+      assert_equal subj, @invoice.reminder_subject
       assert_equal 10, @invoice.payment_period
+      @invoice.invoice_interval = "inv_24"
+      subj = 'Reminder for <year>2011, 2012</year> and <year>2013</year>'
+      retval = @invoice.advance(today - 2)
+      assert_equal subj, @invoice.reminder_subject
     end
   end
 end

@@ -109,12 +109,20 @@ module YDIM
 		include ItemId
 	end
   class AutoInvoice < Invoice
+    @@year_ptrn = %r{<year>([^<])*</year>}
     attr_accessor :invoice_interval, :reminder_body, :reminder_subject
     def invoice_key
       :autoinvoice
     end
     def advance(date)
-      @date = date >> @invoice_interval.to_s[/\d+/].to_i
+      months = @invoice_interval.to_s[/\d+/].to_i
+      if @reminder_subject
+        @reminder_subject.gsub!(@@year_ptrn) do |match|
+          years = months / 12
+          match.gsub(%r{\d+}) do |year| (year.to_i + years).to_s end
+        end
+      end
+      @date = date >> months
     end
   end
 end
