@@ -95,7 +95,7 @@ module YDIM
 			invoice.debitor_address = @debitor.address
 			invoice.items = @items.collect { |item|
         [ item.time, item.text, item.unit, item.quantity.to_f,
-          item.price.to_f ] 
+          item.price.to_f, item.vat.to_f ]
       }
 			invoice
 		end
