@@ -36,6 +36,7 @@ module YDIM
 			lns.push(@contact_title)
 			lns.concat(@address_lines)
 			lns.push(@location, @email)
+      lns.push @country
 			lns.compact!
 			lns
 		end
