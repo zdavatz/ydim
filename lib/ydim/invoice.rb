@@ -102,7 +102,7 @@ module YDIM
     def suppress_vat= bool
       rate = bool ? 0 : Server.config.vat_rate
       @items.each do |item| item.vat_rate = rate end
-      @suppres_vat = bool
+      @suppress_vat = bool
     end
 		def to_pdf
 			pdf_invoice.to_pdf
