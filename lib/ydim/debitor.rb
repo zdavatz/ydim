@@ -7,7 +7,7 @@ module YDIM
 	class Debitor
 		attr_reader :autoinvoices, :unique_id, :invoices
     attr_accessor :address_lines, :contact, :contact_firstname,
-      :contact_title, :debitor_type, :email, :location, :name,
+      :contact_title, :country, :debitor_type, :email, :location, :name,
       :salutation, :phone
 		def initialize(unique_id)
 			@unique_id = unique_id
@@ -45,6 +45,9 @@ module YDIM
 		def delete_invoice(invoice)
 			@invoices.delete(invoice)
 		end
+    def foreign?
+      @country && !@country.to_s.strip.empty?
+    end
 		def invoice(unique_id)
 			@invoices.find { |invoice| invoice.unique_id == unique_id }
 		end

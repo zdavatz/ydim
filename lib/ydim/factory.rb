@@ -14,6 +14,9 @@ module YDIM
                                    @serv.config.invoice_number_start)
 			invoice = AutoInvoice.new(id)
 			yield(invoice) if(block_given?)
+      if debitor.foreign?
+        invoice.suppress_vat = true
+      end
 			invoice.debitor = debitor
 			debitor.autoinvoices.odba_store
 			invoice
@@ -23,6 +26,9 @@ module YDIM
 			invoice = Invoice.new(id)
 			yield(invoice) if(block_given?)
 			invoice.debitor = debitor
+      if debitor.foreign?
+        invoice.suppress_vat = true
+      end
 			debitor.invoices.odba_store
 			invoice
 		end
