@@ -35,8 +35,7 @@ module YDIM
 							 @contact_firstname, @contact].compact.join(' '))
 			lns.push(@contact_title)
 			lns.concat(@address_lines)
-			lns.push(@location, @email)
-      lns.push @country
+			lns.push(@location, @country, @email)
 			lns.compact!
 			lns
 		end
@@ -47,7 +46,8 @@ module YDIM
 			@invoices.delete(invoice)
 		end
     def foreign?
-      @country && !@country.to_s.strip.empty?
+      @country && !@country.to_s.strip.empty? \
+        && @country != Server.config.home_country
     end
 		def invoice(unique_id)
 			@invoices.find { |invoice| invoice.unique_id == unique_id }

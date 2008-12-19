@@ -32,6 +32,7 @@ module YDIM
       'db_user'               => 'ydim',
       'db_auth'               => '',
       'detach'                => false,
+      'home_country'          => 'Schweiz',
       'invoice_number_start'  => 10000,
       'log_level'             => 'INFO',
       'log_file'              => STDOUT,
