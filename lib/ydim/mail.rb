@@ -43,6 +43,15 @@ module YDIM
 				}
 			}
 			recipients
+    rescue Timeout::Error
+      retries ||= 3
+      if retries > 0
+        sleep 3 - retries
+        retries -= 1
+        retry
+      else
+        raise
+      end
 		end
     def Mail.send_reminder(config, autoinvoice)
       subject = autoinvoice.reminder_subject.to_s.strip
