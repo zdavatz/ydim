@@ -20,7 +20,7 @@ module YDIM
 			'server_url'					=> 'druby://localhost:12375', 
 			'currency'						=> 'EUR',
 			'invoice_description'	=> 'Auto-Invoice',
-      'mail_charset'        => 'latin1',
+      'mail_charset'        => 'iso-8859-1',
 			'payment_period'			=> 30,
 		}
 		config = RCLConf::RCLConf.new(ARGV, defaults)

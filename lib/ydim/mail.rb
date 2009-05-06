@@ -20,7 +20,7 @@ module YDIM
 			header = mpart.header
 			header.to = to
 			header.from = config.mail_from
-			header.subject = subject
+      header.subject = encode_subject config, subject
       header.date = Time.now
 			tpart = RMail::Message.new
 			mpart.add_part(tpart)
@@ -67,7 +67,7 @@ module YDIM
         header = mpart.header
         header.to = to
         header.from = config.mail_from
-        header.subject = subject
+        header.subject = encode_subject config, subject
         header.date = Time.now
         header.add('Content-Type', 'text/plain', nil, 
                    'charset' => config.mail_charset)
@@ -82,5 +82,9 @@ module YDIM
         recipients
       end
 		end
+    def Mail.encode_subject(config, subject)
+      encoded = [subject].pack('M')[0..-3].gsub(' ', '=20')
+      sprintf("=?%s?q?%s?=", config.mail_charset, encoded)
+    end
 	end
 end
