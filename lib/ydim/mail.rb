@@ -83,7 +83,7 @@ module YDIM
       end
 		end
     def Mail.encode_subject(config, subject)
-      encoded = [subject].pack('M')[0..-3].gsub(' ', '=20')
+      encoded = [subject].pack('M').gsub("=\n", '').gsub(' ', '=20')
       sprintf("=?%s?q?%s?=", config.mail_charset, encoded)
     end
 	end
