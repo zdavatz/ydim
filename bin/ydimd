@@ -16,7 +16,7 @@ $0 = __FILE__
 config = YDIM::Server.config
 
 ODBA.storage.dbi = ODBA::ConnectionPool.new(config.db_driver_url, 
-	config.db_user, config.db_auth)
+	config.db_user, config.db_auth, :client_encoding => 'LATIN1')
 ODBA.cache.setup
 
 DRb.install_id_conv ODBA::DRbIdConv.new
