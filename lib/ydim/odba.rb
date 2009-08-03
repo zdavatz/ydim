@@ -31,9 +31,9 @@ module YDIM
     alias :save :odba_store
 		ODBA_SERIALIZABLE = ['@items']
     odba_index :status
-    odba_index :unique_id
+    odba_index :unique_id, :class_filter => :instance_of?
 	end
 	class AutoInvoice
-    odba_index :unique_id
+    odba_index :unique_id, :class_filter => :instance_of?
 	end
 end
