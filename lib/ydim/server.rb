@@ -28,7 +28,7 @@ module YDIM
       'currency_update_hour'  => 2,
       'data_dir'              => File.join(ydim_default_dir, 'data'),
       'server_url'            => 'druby://localhost:12375',
-      'db_driver_url'         => 'DBI:pg:ydim',
+      'db_driver_url'         => 'DBI:Pg:ydim',
       'db_user'               => 'ydim',
       'db_auth'               => '',
       'detach'                => false,

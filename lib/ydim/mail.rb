@@ -19,6 +19,7 @@ module YDIM
 			mpart = RMail::Message.new
 			header = mpart.header
 			header.to = to
+      cc = header.cc = debitor.emails_cc
 			header.from = config.mail_from
       header.subject = encode_subject config, subject
       header.date = Time.now
@@ -36,7 +37,7 @@ module YDIM
 			header.add('Content-Transfer-Encoding', 'base64')
 			fpart.body = [invoice.to_pdf].pack('m')
 			smtp = Net::SMTP.new(config.smtp_server)
-			recipients = config.mail_recipients.dup.push(to).uniq
+			recipients = config.mail_recipients.dup.push(to).concat(cc).uniq
 			smtp.start {
 				recipients.each { |recipient|
 					smtp.sendmail(mpart.to_s, config.smtp_from, recipient)
@@ -66,6 +67,7 @@ module YDIM
         mpart = RMail::Message.new
         header = mpart.header
         header.to = to
+        cc = header.cc = debitor.emails_cc
         header.from = config.mail_from
         header.subject = encode_subject config, subject
         header.date = Time.now
@@ -73,7 +75,7 @@ module YDIM
                    'charset' => config.mail_charset)
         mpart.body = body
         smtp = Net::SMTP.new(config.smtp_server)
-        recipients = config.mail_recipients.dup.push(to).uniq
+        recipients = config.mail_recipients.dup.push(to).concat(cc).uniq
         smtp.start {
           recipients.each { |recipient|
             smtp.sendmail(mpart.to_s, config.smtp_from, recipient)

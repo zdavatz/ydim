@@ -7,8 +7,8 @@ module YDIM
 	class Debitor
 		attr_reader :autoinvoices, :unique_id, :invoices
     attr_accessor :address_lines, :contact, :contact_firstname,
-      :contact_title, :country, :debitor_type, :email, :location, :name,
-      :salutation, :phone
+      :contact_title, :country, :debitor_type, :email, :location,
+      :name, :salutation, :phone
 		def initialize(unique_id)
 			@unique_id = unique_id
 			@address_lines = []
@@ -35,7 +35,13 @@ module YDIM
 							 @contact_firstname, @contact].compact.join(' '))
 			lns.push(@contact_title)
 			lns.concat(@address_lines)
-			lns.push(@location, @country, @email)
+			lns.push(@location, @country)
+      if @email
+        lns.push "To: #@email"
+        unless emails_cc.empty?
+          lns.push "Cc: #{emails_cc.join(', ')}"
+        end
+      end
 			lns.compact!
 			lns
 		end
@@ -45,6 +51,20 @@ module YDIM
 		def delete_invoice(invoice)
 			@invoices.delete(invoice)
 		end
+    def emails_cc
+      @emails_cc ||= []
+    end
+    def emails_cc=(emails)
+      @emails_cc = emails
+    end
+    def emails
+      [ @email ].concat(emails_cc).compact
+    end
+    def emails=(emails)
+      @email = emails.shift
+      @emails_cc = emails
+      emails
+    end
     def foreign?
       @country && !@country.to_s.strip.empty? \
         && @country != Server.config.home_country

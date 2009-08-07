@@ -46,6 +46,7 @@ module YDIM
     def test_send_invoice
       debitor = flexmock('Debitor')
       debitor.should_receive(:email).and_return('test@ywesee.com')
+      debitor.should_receive(:emails_cc).and_return(['test.cc@ywesee.com'])
       debitor.should_receive(:salutation).and_return('Herr')
       debitor.should_receive(:name).and_return('Company-Name')
       debitor.should_receive(:contact).and_return('Contact-Name')
@@ -57,15 +58,18 @@ module YDIM
       smtp = flexmock('SMTP')
       flexstub(Net::SMTP).should_receive(:new).and_return(smtp)
       smtp.should_receive(:start).and_return { |block| block.call }
-      smtp.should_receive(:sendmail).with(String, 
+      smtp.should_receive(:sendmail).with(String,
         'smtp@ywesee.com', 'cc@ywesee.com').and_return { assert(true) }
-      smtp.should_receive(:sendmail).with(String, 
+      smtp.should_receive(:sendmail).with(String,
         'smtp@ywesee.com', 'test@ywesee.com').and_return { assert(true) }
+      smtp.should_receive(:sendmail).with(String,
+        'smtp@ywesee.com', 'test.cc@ywesee.com').and_return { assert(true) }
       Mail.send_invoice(setup_config, invoice)
     end
     def test_send_reminder
       debitor = flexmock('Debitor')
       debitor.should_receive(:email).and_return('test@ywesee.com')
+      debitor.should_receive(:emails_cc).and_return(['test.cc@ywesee.com'])
       debitor.should_receive(:salutation).and_return('Herr')
       debitor.should_receive(:name).and_return('Company-Name')
       debitor.should_receive(:contact).and_return('Contact-Name')
@@ -78,10 +82,12 @@ module YDIM
       smtp = flexmock('SMTP')
       flexstub(Net::SMTP).should_receive(:new).and_return(smtp)
       smtp.should_receive(:start).and_return { |block| block.call }
-      smtp.should_receive(:sendmail).with(String, 
+      smtp.should_receive(:sendmail).with(String,
         'smtp@ywesee.com', 'cc@ywesee.com').and_return { assert(true) }
-      smtp.should_receive(:sendmail).with(String, 
+      smtp.should_receive(:sendmail).with(String,
         'smtp@ywesee.com', 'test@ywesee.com').and_return { assert(true) }
+      smtp.should_receive(:sendmail).with(String,
+        'smtp@ywesee.com', 'test.cc@ywesee.com').and_return { assert(true) }
       Mail.send_reminder(setup_config, invoice)
     end
   end

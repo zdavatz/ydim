@@ -17,7 +17,7 @@ module YDIM
 			assert_equal([], @invoice.items)
 			item_id = 0
 			item = FlexMock.new
-			item.mock_handle(:index=, 2) { |idx|
+			item.should_receive(:index=, 2).and_return { |idx|
 				assert_equal(item_id, idx)
 				item_id += 1
 			}
@@ -27,7 +27,6 @@ module YDIM
 			retval = @invoice.add_item(item)
 			assert_equal([item, item], @invoice.items)
 			assert_equal(item, retval)
-			item.mock_verify
 		end
 		def test_item
 			item = flexmock('item')
@@ -38,21 +37,18 @@ module YDIM
 		end
 		def test_debitor_writer
 			debitor = FlexMock.new
-			debitor.mock_handle(:add_invoice, 1) { |arg|
+			debitor.should_receive(:add_invoice, 1).and_return { |arg|
 				assert_equal(@invoice, arg)
 			}
 			@invoice.debitor = debitor
-			debitor.mock_verify
 			debitor2 = FlexMock.new
-			debitor.mock_handle(:delete_invoice, 1) { |arg|
+			debitor.should_receive(:delete_invoice, 1).and_return { |arg|
 				assert_equal(@invoice, arg)
 			}
-			debitor2.mock_handle(:add_invoice, 1) { |arg|
+			debitor2.should_receive(:add_invoice, 1).and_return { |arg|
 				assert_equal(@invoice, arg)
 			}
 			@invoice.debitor = debitor2
-			debitor.mock_verify
-			debitor2.mock_verify
 		end
 		def test_due_date
 			@invoice.payment_period = nil
@@ -67,10 +63,10 @@ module YDIM
 		end
 		def test_pdf_invoice
 			debitor = FlexMock.new
-			debitor.mock_handle(:add_invoice, 1) { |arg|
+			debitor.should_receive(:add_invoice, 1).and_return { |arg|
 				assert_equal(@invoice, arg)
 			}
-			debitor.mock_handle(:address) { ['address'] }
+			debitor.should_receive(:address).and_return { ['address'] }
 			@invoice.debitor = debitor
 			@invoice.description = 'description'
 			pdf = @invoice.pdf_invoice

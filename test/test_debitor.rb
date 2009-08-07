@@ -20,20 +20,21 @@ module YDIM
 			@debitor.contact_firstname = 'Firstname'
 			@debitor.contact_title = 'Title'
 			@debitor.address_lines = %w{Line1 Line2}
-			@debitor.email = 'Email'
+			@debitor.emails = ['Email', 'OtherEmail']
 			expected = [
 				'Name',
 				'z.H. Firstname Contact',
-				'Title', 
+				'Title',
 				'Line1',
 				'Line2',
-				'Email',
+				'To: Email',
+        'Cc: OtherEmail',
 			]
 			assert_equal(expected, @debitor.address)
 		end
 		def test_add_invoice
 			invoice = FlexMock.new()
-			invoice.mock_handle(:unique_id) { 17 }
+			invoice.should_receive(:unique_id).and_return { 17 }
 			retval = @debitor.add_invoice(invoice)
 			assert_equal(invoice, retval)
 			assert_equal([invoice], @debitor.invoices)
@@ -41,10 +42,10 @@ module YDIM
 		end
 		def test_delete_invoice
 			invoice = FlexMock.new()
-			invoice.mock_handle(:unique_id) { 17 }
+			invoice.should_receive(:unique_id).and_return { 17 }
 			@debitor.invoices.push(invoice)
 			retval = @debitor.delete_invoice(invoice)
-			assert_equal(invoice, retval)	
+			assert_equal(invoice, retval)
 			assert_equal([], @debitor.invoices)
 			assert_nil(@debitor.delete_invoice(invoice))
 		end
@@ -61,7 +62,7 @@ module YDIM
 			invoice.should_receive(:unique_id).and_return(17)
 			@debitor.autoinvoices.push(invoice)
 			retval = @debitor.delete_autoinvoice(invoice)
-			assert_equal(invoice, retval)	
+			assert_equal(invoice, retval)
 			assert_equal([], @debitor.autoinvoices)
 			assert_nil(@debitor.delete_autoinvoice(invoice))
 		end

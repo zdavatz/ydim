@@ -18,7 +18,7 @@ module YDIM
 	end
 	class Debitor
 		include ODBA::Persistable
-		ODBA_SERIALIZABLE = ['@address_lines', '@hosting_items']
+		ODBA_SERIALIZABLE = ['@address_lines', '@emails_cc', '@hosting_items']
     odba_index :email
     odba_index :name
     odba_index :unique_id

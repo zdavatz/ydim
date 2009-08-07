@@ -27,16 +27,16 @@ module YDIM
             blc.call
           }
 			}
-			@user.mock_handle(:unique_id) { 'user' }
-			@serv.mock_handle(:logger) { @mock_logger }
+			@user.should_receive(:unique_id).and_return { 'user' }
+			@serv.should_receive(:logger).and_return { @mock_logger }
 			block.call
-			@mock_logger.mock_verify
 		end
 		def test_add_items
-			config = FlexMock.new
-			config.mock_handle(:vat_rate) { 7.6 }
-			invoice = FlexMock.new
-			@serv.mock_handle(:config) { config }
+			config = FlexMock.new('config')
+			config.should_receive(:vat_rate).and_return { 7.6 }
+			invoice = FlexMock.new('invoice')
+			invoice.should_receive(:suppress_vat).and_return { false }
+			@serv.should_receive(:config).and_return { config }
       flexstub(Invoice).should_receive(:find_by_unique_id)\
         .with('123').and_return(invoice)
 			items = [
@@ -50,18 +50,17 @@ module YDIM
 					:vat_rate => 7.6, :data => {}, :time => Time.now, :expiry_time => nil},
 			]
 			added_items = []
-			invoice.mock_handle(:add_item) { |item|
+			invoice.should_receive(:add_item).and_return { |item|
 				assert_instance_of(Item, item)
 				added_items.push(item)	
 			}
-			invoice.mock_handle(:items) { added_items }
-			invoice.mock_handle(:odba_store, 1) {}
+			invoice.should_receive(:items).and_return { added_items }
+			invoice.should_receive(:odba_store, 1).and_return {}
 			retval = nil
 			assert_logged(:debug, :debug) { 
 				retval = @session.add_items(123, items) 
 			}
 			assert_equal(added_items, retval)
-			invoice.mock_verify
 		end
     def test_autoinvoice
       inv = flexmock('autoinvoice')
@@ -123,14 +122,14 @@ module YDIM
     def test_create_autoinvoice
       factory = FlexMock.new
       flexstub(Debitor).should_receive(:find_by_unique_id).with("1")
-      @serv.mock_handle(:factory) { factory }
-      assert_logged(:debug, :debug, :error) {
+      @serv.should_receive(:factory).and_return { factory }
+      assert_logged(:debug, :debug, :debug, :debug, :error) {
         assert_raises(IndexError) { @session.create_autoinvoice(1) }
       }
       debitor = flexmock('Debitor')
       flexstub(Debitor).should_receive(:find_by_unique_id).with("2")\
         .and_return(debitor)
-      factory.mock_handle(:create_autoinvoice) { |deb|
+      factory.should_receive(:create_autoinvoice).and_return { |deb|
         assert_equal(debitor, deb)
         'invoice created by Factory'
       }
@@ -140,8 +139,8 @@ module YDIM
     end
     def test_create_debitor
       id_server = FlexMock.new
-      @serv.mock_handle(:id_server) { id_server }
-      id_server.mock_handle(:next_id) { |key|
+      @serv.should_receive(:id_server).and_return { id_server }
+      id_server.should_receive(:next_id).and_return { |key|
         assert_equal(:debitor, key)
         23
       }
@@ -160,14 +159,14 @@ module YDIM
     def test_create_invoice
       factory = FlexMock.new
       flexstub(Debitor).should_receive(:find_by_unique_id).with("1")
-      @serv.mock_handle(:factory) { factory }
-      assert_logged(:debug, :debug, :error) {
+      @serv.should_receive(:factory).and_return { factory }
+      assert_logged(:debug, :debug, :debug, :debug, :error) {
         assert_raises(IndexError) { @session.create_invoice(1) }
       }
       debitor = flexmock('Debitor')
       flexstub(Debitor).should_receive(:find_by_unique_id).with("2")\
         .and_return(debitor)
-      factory.mock_handle(:create_invoice) { |deb|
+      factory.should_receive(:create_invoice).and_return { |deb|
         assert_equal(debitor, deb)
         'invoice created by Factory'
       }
@@ -216,22 +215,21 @@ module YDIM
 		def test_delete_item
 			invoice = FlexMock.new
 			item1 = FlexMock.new
-			item1.mock_handle(:index) { 0 }
+			item1.should_receive(:index).and_return { 0 }
 			item2 = FlexMock.new
-			item2.mock_handle(:index) { 1 }
+			item2.should_receive(:index).and_return { 1 }
 			item3 = FlexMock.new
-			item3.mock_handle(:index) { 2 }
+			item3.should_receive(:index).and_return { 2 }
 			items = [item1, item2, item3]
       flexstub(Invoice).should_receive(:find_by_unique_id)\
         .with('3').and_return(invoice)
-			invoice.mock_handle(:items) { items }
-			invoice.mock_handle(:odba_store, 1) {}
+			invoice.should_receive(:items).and_return { items }
+			invoice.should_receive(:odba_store, 1).and_return {}
 			retval = nil
 			assert_logged(:debug, :debug) {
 				retval = @session.delete_item(3, 1)
 			}
 			assert_equal([item1,item3], retval)
-			invoice.mock_verify
 		end
     def test_generate_invoice
       factory = flexmock('factory')

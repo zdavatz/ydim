@@ -4,6 +4,7 @@
 require 'pdfinvoice/config'
 require 'pdfinvoice/invoice'
 require 'ydim/item'
+require 'ydim/server'
 
 module YDIM
 	class Invoice
@@ -100,7 +101,7 @@ module YDIM
 			invoice
 		end
     def suppress_vat= bool
-      rate = bool ? 0 : Server.config.vat_rate
+      rate = bool ? 0 : YDIM::Server.config.vat_rate
       @items.each do |item| item.vat_rate = rate end
       @suppress_vat = bool
     end

@@ -22,54 +22,55 @@ module YDIM
 		end
 		def test_create_invoice
 			@config.should_receive(:invoice_number_start).and_return(13)
-			@id_server.mock_handle(:next_id) { |key, start|
+			@id_server.should_receive(:next_id).and_return { |key, start|
 				assert_equal(13, start)
 				assert_equal(:invoice, key)
 				24
 			}
 			debitor = FlexMock.new
-			debitor.mock_handle(:add_invoice) { |inv|
+      debitor.should_receive(:foreign?).and_return(false)
+			debitor.should_receive(:add_invoice).and_return { |inv|
 				assert_instance_of(Invoice, inv)
 			}
 			dinvs = nil
-			debitor.mock_handle(:invoices) { 
+			debitor.should_receive(:invoices).and_return {
 				dinvs = FlexMock.new
-				dinvs.mock_handle(:odba_store, 1)
+				dinvs.should_receive(:odba_store, 1).and_return
 				dinvs
 			}
 			invoice = nil
 			assert_nothing_raised { invoice = @factory.create_invoice(debitor) }
 			assert_instance_of(Invoice, invoice)
-			dinvs.mock_verify
     end
 		def test_create_autoinvoice
 			@config.should_receive(:invoice_number_start).and_return(13)
-			@id_server.mock_handle(:next_id) { |key, start|
+			@id_server.should_receive(:next_id).and_return { |key, start|
 				assert_equal(13, start)
 				assert_equal(:autoinvoice, key)
 				24
 			}
 			debitor = FlexMock.new
-			debitor.mock_handle(:add_autoinvoice) { |inv|
+      debitor.should_receive(:foreign?).and_return(false)
+			debitor.should_receive(:add_autoinvoice).and_return { |inv|
 				assert_instance_of(AutoInvoice, inv)
 			}
 			dinvs = nil
-			debitor.mock_handle(:autoinvoices) { 
+			debitor.should_receive(:autoinvoices).and_return {
 				dinvs = FlexMock.new
-				dinvs.mock_handle(:odba_store, 1)
+				dinvs.should_receive(:odba_store, 1).and_return
 				dinvs
 			}
 			invoice = nil
-			assert_nothing_raised { 
+			assert_nothing_raised {
         invoice = @factory.create_autoinvoice(debitor) }
 			assert_instance_of(AutoInvoice, invoice)
-			dinvs.mock_verify
 	end
     def test_generate_invoice
       @config.should_receive(:vat_rate).and_return('current_vat_rate')
       invs = flexmock('Invoices')
       invs.should_receive(:odba_store).times(1)
       debitor = flexmock('Debitor')
+      debitor.should_receive(:foreign?).and_return(false)
       debitor.should_receive(:invoices).and_return(invs)
       debitor.should_receive(:add_invoice).and_return { |invoice|
         assert_equal(24, invoice.unique_id)
@@ -81,13 +82,13 @@ module YDIM
       auto.invoice_interval = 3
       item = Item.new
       auto.add_item(item)
-      
+
       auto.instance_variable_set('@debitor', debitor)
-      flexstub(auto).should_receive(:odba_store).and_return { 
+      flexstub(auto).should_receive(:odba_store).and_return {
         assert_equal(Date.today >> 3, auto.date)
       }
 			@config.should_receive(:invoice_number_start).and_return(13)
-			@id_server.mock_handle(:next_id) { |key, start|
+			@id_server.should_receive(:next_id).and_return { |key, start|
 				assert_equal(13, start)
 				assert_equal(:invoice, key)
 				24
