@@ -10,7 +10,7 @@ module YDIM
 			salutation = config.salutation[debitor.salutation.to_s]
 			sprintf(config.mail_body, salutation, debitor.contact, invoice.description)
 		end
-		def Mail.send_invoice(config, invoice)
+		def Mail.send_invoice(config, invoice, sort_args={})
 			debitor = invoice.debitor
 			to = debitor.email
 			subject = sprintf('Rechnung %s #%i, %s', debitor.name,
@@ -35,7 +35,7 @@ module YDIM
 			header.add('Content-Disposition', 'attachment', nil,
 				{'filename' => invoice_name })
 			header.add('Content-Transfer-Encoding', 'base64')
-			fpart.body = [invoice.to_pdf].pack('m')
+			fpart.body = [invoice.to_pdf(sort_args)].pack('m')
 			smtp = Net::SMTP.new(config.smtp_server)
 			recipients = config.mail_recipients.dup.push(to).concat(cc).uniq
 			smtp.start {

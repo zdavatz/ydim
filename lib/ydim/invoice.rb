@@ -85,29 +85,41 @@ module YDIM
 				'is_open'
 			end
 		end
-		def pdf_invoice
-			config = PdfInvoice.config.dup
-			config.formats['quantity'] = "%1.#{@precision}f"
+    def pdf_invoice(sort_args={})
+      config = PdfInvoice.config.dup
+      config.formats['quantity'] = "%1.#{@precision}f"
       config.formats['total'] = "#{@currency} %1.2f"
-			invoice = PdfInvoice::Invoice.new(config)
-			invoice.date = @date
-			invoice.invoice_number = @unique_id
-			invoice.description = @description
-			invoice.debitor_address = @debitor.address
-			invoice.items = @items.collect { |item|
+      invoice = PdfInvoice::Invoice.new(config)
+      invoice.date = @date
+      invoice.invoice_number = @unique_id
+      invoice.description = @description
+      invoice.debitor_address = @debitor.address
+      items = @items
+      if sort_by = sort_args[:sortby]
+        begin
+          items = items.sort_by do |item|
+            item.send(sort_by)
+          end
+          if sort_args[:sort_reverse]
+            items.reverse!
+          end
+        rescue StandardError
+        end
+      end
+      invoice.items = items.collect { |item|
         [ item.time, item.text, item.unit, item.quantity.to_f,
           item.price.to_f, item.vat.to_f ]
       }
-			invoice
-		end
+      invoice
+    end
     def suppress_vat= bool
       rate = bool ? 0 : YDIM::Server.config.vat_rate
       @items.each do |item| item.vat_rate = rate end
       @suppress_vat = bool
     end
-		def to_pdf
-			pdf_invoice.to_pdf
-		end
+    def to_pdf(sort_args={})
+      pdf_invoice(sort_args).to_pdf
+    end
 		sum :total_brutto
 		sum :total_netto
 		sum :vat

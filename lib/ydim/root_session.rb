@@ -123,9 +123,9 @@ module YDIM
 			Debitor.search_by_exact_email(email_or_name) |
 				Debitor.search_by_exact_name(email_or_name)
 		end
-		def send_invoice(invoice_id)
+		def send_invoice(invoice_id, sort_args={})
 			@serv.logger.info(whoami) { "send_invoice(#{invoice_id})" }
-			Mail.send_invoice(@serv.config, invoice(invoice_id))
+			Mail.send_invoice(@serv.config, invoice(invoice_id), sort_args)
 		end
 		def update_item(invoice_id, index, data, invoice_key=:invoice)
 			@serv.logger.debug(whoami) { 
