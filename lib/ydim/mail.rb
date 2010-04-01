@@ -3,6 +3,7 @@
 
 require 'net/smtp'
 require 'rmail'
+require 'ydim/smtp_tls'
 
 module YDIM
 	module Mail
@@ -36,11 +37,12 @@ module YDIM
 				{'filename' => invoice_name })
 			header.add('Content-Transfer-Encoding', 'base64')
 			fpart.body = [invoice.to_pdf(sort_args)].pack('m')
-			smtp = Net::SMTP.new(config.smtp_server)
 			recipients = config.mail_recipients.dup.push(to).concat(cc).uniq
-			smtp.start {
+			Net::SMTP.start(config.smtp_server, config.smtp_port,
+                      config.smtp_domain, config.smtp_user, config.smtp_pass,
+                      config.smtp_authtype) { |smtp|
 				recipients.each { |recipient|
-					smtp.sendmail(mpart.to_s, config.smtp_from, recipient)
+					smtp.sendmail(mpart.to_s, config.smtp_user, recipient)
 				}
 			}
 			recipients
@@ -74,11 +76,12 @@ module YDIM
         header.add('Content-Type', 'text/plain', nil, 
                    'charset' => config.mail_charset)
         mpart.body = body
-        smtp = Net::SMTP.new(config.smtp_server)
         recipients = config.mail_recipients.dup.push(to).concat(cc).uniq
-        smtp.start {
+        Net::SMTP.start(config.smtp_server, config.smtp_port,
+                        config.smtp_domain, config.smtp_user, config.smtp_pass,
+                        config.smtp_authtype) { |smtp|
           recipients.each { |recipient|
-            smtp.sendmail(mpart.to_s, config.smtp_from, recipient)
+            smtp.sendmail(mpart.to_s, config.smtp_user, recipient)
           }
         }
         recipients

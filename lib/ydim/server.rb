@@ -49,7 +49,12 @@ module YDIM
         'Frau'                =>  'Sehr geehrte Frau',
       },
       'smtp_from'             => '',
+      'smtp_authtype'         => :plain,
+      'smtp_domain'           => 'ywesee.com',
+      'smtp_pass'             => nil,
+      'smtp_port'             => 587,
       'smtp_server'           => 'localhost',
+      'smtp_user'             => 'ydim@ywesee.com',
       'vat_rate'              => 7.6,
     }
     config = RCLConf::RCLConf.new(ARGV, defaults)
