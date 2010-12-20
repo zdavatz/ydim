@@ -5,7 +5,7 @@ require 'rclconf'
 require 'fileutils'
 
 module YDIM
-        VERSION = 1.0.0
+        VERSION = '1.0.0'
 	class Client
 		home_dir = ENV['HOME'] || '/tmp'
 		ydim_default_dir = File.join(home_dir, '.ydim')
