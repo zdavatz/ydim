@@ -1,0 +1,66 @@
+.autotest
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/ydim
+lib/ydim.rb
+test/test_ydim.rb
+(in /home/zeno/.software/ydim)
+--- Manifest.txt	2010-12-20 11:49:43.440074041 +0100
++++ Manifest.tmp	2010-12-20 11:49:43.592089680 +0100
+@@ -1,9 +1,49 @@
+-.autotest
+ History.txt
++InstalledFiles
++LICENSE.txt
+ Manifest.txt
+ README.txt
+ Rakefile
+-bin/ydim
+-lib/ydim.rb
+-test/test_ydim.rb
+-(in /home/zeno/.software/ydim)
++bin/ydim-edit
++bin/ydim-inject
++bin/ydimd
++config.save
++install.rb
++lib/ydim/autoinvoicer.rb
++lib/ydim/client.rb
++lib/ydim/config.rb
++lib/ydim/currency_converter.rb
++lib/ydim/currency_updater.rb
++lib/ydim/debitor.rb
++lib/ydim/factory.rb
++lib/ydim/invoice.rb
++lib/ydim/item.rb
++lib/ydim/mail.rb
++lib/ydim/odba.rb
++lib/ydim/root_session.rb
++lib/ydim/root_user.rb
++lib/ydim/server.rb
++lib/ydim/smtp_tls.rb
++lib/ydim/util.rb
++test/data/search.html
++test/stub/odba.rb
++test/suite.rb
++test/test_autoinvoicer.rb
++test/test_currency_converter.rb
++test/test_currency_updater.rb
++test/test_debitor.rb
++test/test_factory.rb
++test/test_invoice.rb
++test/test_item.rb
++test/test_mail.rb
++test/test_root_session.rb
++test/test_root_user.rb
++test/test_server.rb
++ydim/.autotest
++ydim/History.txt
++ydim/Manifest.txt
++ydim/README.txt
++ydim/Rakefile
++ydim/bin/ydim
++ydim/lib/ydim.rb
++ydim/test/test_ydim.rb
