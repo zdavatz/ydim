@@ -312,7 +312,7 @@ module YDIM
       flexstub(Invoice).should_receive(:find_by_unique_id)\
         .with('17').and_return(inv)
       @serv.should_receive(:config).and_return('cnf')
-      flexstub(Mail).should_receive(:send_invoice).with('cnf', inv)
+      flexstub(Mail).should_receive(:send_invoice).with('cnf', inv, {})
       assert_logged(:info, :debug) {
         @session.send_invoice(17)
       }

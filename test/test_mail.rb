@@ -29,6 +29,11 @@ module YDIM
       }
       config.should_receive(:smtp_from).and_return('smtp@ywesee.com')
       config.should_receive(:smtp_server).and_return('localhost')
+      config.should_receive(:smtp_port).and_return('123')
+      config.should_receive(:smtp_domain).and_return('ywesee.com')
+      config.should_receive(:smtp_user).and_return('user')
+      config.should_receive(:smtp_pass).and_return('pass')
+      config.should_receive(:smtp_authtype).and_return('plain')
       config
     end
     def test_body
@@ -57,7 +62,7 @@ module YDIM
       invoice.should_receive(:to_pdf).times(1).and_return('pdf-document')
       smtp = flexmock('SMTP')
       flexstub(Net::SMTP).should_receive(:new).and_return(smtp)
-      smtp.should_receive(:start).and_return { |block| block.call }
+      smtp.should_receive(:start)
       smtp.should_receive(:sendmail).with(String,
         'smtp@ywesee.com', 'cc@ywesee.com').and_return { assert(true) }
       smtp.should_receive(:sendmail).with(String,
@@ -81,7 +86,7 @@ module YDIM
       invoice.should_receive(:reminder_body).and_return('Reminder Body')
       smtp = flexmock('SMTP')
       flexstub(Net::SMTP).should_receive(:new).and_return(smtp)
-      smtp.should_receive(:start).and_return { |block| block.call }
+      smtp.should_receive(:start)
       smtp.should_receive(:sendmail).with(String,
         'smtp@ywesee.com', 'cc@ywesee.com').and_return { assert(true) }
       smtp.should_receive(:sendmail).with(String,
