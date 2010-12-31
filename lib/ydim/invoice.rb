@@ -89,6 +89,11 @@ module YDIM
       config = PdfInvoice.config.dup
       config.formats['quantity'] = "%1.#{@precision}f"
       config.formats['total'] = "#{@currency} %1.2f"
+      if(item = @items[0])
+        if((item.vat_rate - YDIM::Server.config.vat_rate).abs > 0.1)
+          config.texts['tax'] = "MwSt 7.6%"
+        end
+      end
       invoice = PdfInvoice::Invoice.new(config)
       invoice.date = @date
       invoice.invoice_number = @unique_id
