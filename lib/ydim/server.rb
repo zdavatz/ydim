@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-# Server -- ydim -- 10.01.2006 -- hwyss@ywesee.com
+# encoding: utf-8
+# YDIM::Server -- ydim -- 09.12.2011 -- mhatakeyama@ywesee.com
+# YDIM::Server -- ydim -- 10.01.2006 -- hwyss@ywesee.com
 
 require 'logger'
 require 'needle'
@@ -12,6 +14,7 @@ require 'ydim/currency_updater'
 require 'ydim/factory'
 require 'ydim/root_user'
 require 'ydim/util'
+require 'odba/18_19_loading_compatibility'
 
 module YDIM
 	class Server
