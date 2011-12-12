@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-# Invoice -- ydim -- 11.01.2006 -- hwyss@ywesee.com
+# encoding: utf-8
+# YDIM::Invoice -- ydim -- 12.12.2012 -- hwyss@ywesee.com
+# YDIM::Invoice -- ydim -- 11.01.2006 -- hwyss@ywesee.com
 
 require 'pdfinvoice/config'
 require 'pdfinvoice/invoice'
@@ -27,6 +29,9 @@ module YDIM
 				@items.inject(0.0) { |value, item| value + item.send(key) }
 			}
 		end
+    def date=(d)
+      @date = Date.new(d.year, d.month, d.day)
+    end
 		def initialize(unique_id)
 			@unique_id = unique_id
 			@items = []
