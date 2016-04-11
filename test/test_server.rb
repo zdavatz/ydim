@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 # TestServer -- ydim -- 10.01.2006 -- hwyss@ywesee.com
-
-
 $: << File.expand_path('../lib', File.dirname(__FILE__))
+$: << File.expand_path('..', File.dirname(__FILE__))
 
 require 'test/unit'
 require 'test/stub/odba'

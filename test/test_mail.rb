@@ -5,7 +5,7 @@ $: << File.expand_path('../lib', File.dirname(__FILE__))
 
 require 'test/unit'
 require 'ydim/mail'
-require 'flexmock'
+require 'flexmock/test_unit'
 
 module YDIM
   class TestMail < Test::Unit::TestCase
