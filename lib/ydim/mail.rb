@@ -2,7 +2,7 @@
 # Mail -- ydim -- 18.01.2006 -- hwyss@ywesee.com
 
 require 'net/smtp'
-require 'rmail'
+require 'mail'
 require 'ydim/smtp_tls'
 
 module YDIM

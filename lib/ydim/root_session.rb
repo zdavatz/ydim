@@ -2,7 +2,6 @@
 # RootSession -- ydim -- 10.01.2006 -- hwyss@ywesee.com
 
 require 'drb'
-require 'encoding/character/utf-8'
 require 'ydim/autoinvoicer'
 require 'ydim/debitor'
 require 'ydim/invoice'

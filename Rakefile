@@ -1,28 +1,21 @@
-# -*- ruby -*-
+#!/usr/bin/env ruby
+# encoding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'ydim/version'
+require "bundler/gem_tasks"
+require 'rspec/core/rake_task'
 
-require 'rubygems'
-require 'hoe'
+RSpec::Core::RakeTask.new(:spec)
 
-# Hoe.plugin :compiler
-# Hoe.plugin :cucumberfeatures
-# Hoe.plugin :gem_prelude_sucks
-# Hoe.plugin :inline
-# Hoe.plugin :inline
-# Hoe.plugin :manifest
-# Hoe.plugin :newgem
-# Hoe.plugin :racc
-# Hoe.plugin :rubyforge
-# Hoe.plugin :rubyforge
-# Hoe.plugin :website
+# dependencies are now declared in ydim.gemspec
 
-Hoe.spec 'ydim' do
-  # HEY! If you fill these out in ~/.hoe_template/Rakefile.erb then
-  # you'll never have to touch them again!
-  # (delete this comment too, of course)
-
-developer('Masaomi Hatakeyama, Zeno R.R. Davatz', 'mhatakeyama@ywesee.com, zdavatz@ywesee.com')
-
-  # self.rubyforge_name = 'ydimx' # if different than 'ydim'
+desc 'Offer a gem task like hoe'
+task :gem => :build do
+  Rake::Task[:build].invoke
 end
 
-# vim: syntax=ruby
+task :spec => :clean
+
+require 'rake/clean'
+CLEAN.include FileList['pkg/*.gem']

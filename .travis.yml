@@ -1,0 +1,27 @@
+language: ruby
+
+bundler_args: --without debugger
+
+cache: bundler
+sudo: false
+
+before_install:
+  - gem --version
+
+script: bundle exec test/suite.rb
+
+rvm:
+  - 1.9.3
+  - 2.1
+  - 2.2
+  - 2.3
+  - ruby-head
+  
+matrix:
+  allow_failures:
+    - rvm: ruby-head
+
+notifications:
+  email:
+    recipients:
+      - ngiger@ywesee.com
