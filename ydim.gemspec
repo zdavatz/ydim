@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "needle"
   spec.add_dependency "pdf-writer"
   spec.add_dependency "rrba"
+  spec.add_dependency "dbd-pg"
   spec.add_dependency "hpricot"
   spec.add_runtime_dependency 'deprecated', '= 2.0.1'
 
