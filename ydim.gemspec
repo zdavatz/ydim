@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
 
   # Exact specification of dbi is in the Gemfile, as we cannot declare a :git dependency in ydim.gemspec
   # we have some important patches here!!
-  spec.add_dependency "dbi", '0.4.5'
+  spec.add_dependency "dbi", '0.4.6'
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "rake"
