@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "syck"
   spec.add_dependency "rmail"
   spec.add_dependency "odba"
   spec.add_dependency "rclconf"
@@ -29,7 +30,7 @@ Gem::Specification.new do |spec|
 
   # Exact specification of dbi is in the Gemfile, as we cannot declare a :git dependency in ydim.gemspec
   # we have some important patches here!!
-  spec.add_dependency "dbi", '0.4.6'
+  spec.add_dependency "dbi"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "rake"

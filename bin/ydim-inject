@@ -7,7 +7,8 @@ input = if(File.exist?(ARGV.first.to_s))
 				end
 
 require 'yaml'
-
+require 'syck'
+puts "YAML is now #{YAML} in #{__FILE__} at #{__LINE__}"
 data = YAML.load(input) || exit(-1)
 
 require 'openssl'

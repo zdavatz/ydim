@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
 # ypdmd -- ydim -- 09.11.2005 -- hwyss@ywesee.com
 
+require 'yaml'
+require 'syck'
+require 'pg'
+require 'dbi'
+puts "YAML is now #{YAML} in #{__FILE__} at #{__LINE__}"
+
 require 'ydim/server'
 require 'ydim/odba'
 require 'rclconf'

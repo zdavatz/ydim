@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 # ypdmd -- ydim -- 12.01.2005 -- hwyss@ywesee.com
 
+require 'yaml'
+require 'syck'
+
 require 'ydim/server'
 require 'ydim/odba'
 require 'logger'
