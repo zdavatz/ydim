@@ -3,13 +3,13 @@
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
-require 'flexmock'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'ydim/autoinvoicer'
 require 'ydim/invoice'
 
 module YDIM
-  class TestAutoInvoicer < Test::Unit::TestCase
+  class TestAutoInvoicer < Minitest::Test
     include FlexMock::TestCase
     def setup
       @serv = flexmock('Registry')

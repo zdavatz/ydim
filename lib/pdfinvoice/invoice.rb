@@ -74,8 +74,7 @@ module PdfInvoice
 			pdf.start_columns(2)
 			pdf.text(@config.due_days, @config.text_options)
 			pdf.start_new_page
-			pdf.text(@date.strftime(@config.formats['date']), 
-				@config.text_options)
+			pdf.text(@date.strftime(@config.formats['date']), @config.text_options)
 			pdf.stop_columns
 		end
 		def pdf_items(pdf)
@@ -186,13 +185,17 @@ module PdfInvoice
 			}
 			pdf.select_font(@config.font)
 		end
-		def pdf_lines(pdf, lines)
-			if(lines)
-				lines.each { |line|
-					pdf.text(line.strip, @config.text_options) 
-				}
-			end
-		end
+    def pdf_lines(pdf, lines)
+      if (lines && lines.is_a?(Array))
+        lines.each { |line|
+          pdf.text(line.strip, @config.text_options)
+        }
+      elsif (lines && lines.is_a?(String))
+        lines.each_line { |line|
+          pdf.text(line.strip, @config.text_options)
+        }
+      end
+    end
 		def	text_width(pdf, text)
 			pdf.text_width(text) * PDF::SimpleTable::WIDTH_FACTOR
 		end

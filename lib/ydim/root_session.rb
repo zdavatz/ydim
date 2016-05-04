@@ -80,10 +80,18 @@ module YDIM
         raise IndexError, msg
       end
 		end
-		def debitors
-			@serv.logger.debug(whoami) { "debitors" }
-			Debitor.odba_extent
-		end
+    def debitors
+      @serv.logger.debug(whoami) { "debitors" } if @serv &&  @serv.respond_to?(:logger)
+      Debitor.odba_extent
+    end
+    def invoices
+      @serv.logger.debug(whoami) { "invoices" } if @serv &&  @serv.respond_to?(:logger)
+      Invoice.odba_extent
+    end
+    def autoinvoices
+      @serv.logger.debug(whoami) { "autoinvoices" } if @serv &&  @serv.respond_to?(:logger)
+      AutoInvoice.odba_extent
+    end
     def delete_autoinvoice(invoice_id)
 			@serv.logger.debug(whoami) { 
 				"delete_autoinvoice(#{invoice_id})" }

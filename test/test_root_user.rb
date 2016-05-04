@@ -3,11 +3,12 @@
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'ydim/root_user'
 
 module YDIM
-	class TestRootUser < Test::Unit::TestCase
+	class TestRootUser < Minitest::Test
 		def setup
 			@user = RootUser.new(:root)
 		end

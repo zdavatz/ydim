@@ -4,12 +4,12 @@
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'ydim/currency_updater'
-require 'flexmock'
 
 module YDIM
-	class TestCurrencyUpdater < Test::Unit::TestCase
+	class TestCurrencyUpdater < Minitest::Test
     include FlexMock::TestCase
 		def setup
 			@serv = flexmock('Config')

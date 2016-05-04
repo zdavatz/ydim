@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: utf-8
 # Factory -- ydim -- 16.01.2006 -- hwyss@ywesee.com
 
 require 'ydim/debitor'

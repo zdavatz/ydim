@@ -3,11 +3,12 @@
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'ydim/currency_converter'
 
 module YDIM
-	class TestCurrencyConverter < Test::Unit::TestCase
+	class TestCurrencyConverter < Minitest::Test
 		def setup
 			@converter = CurrencyConverter.new
 		end

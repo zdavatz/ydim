@@ -3,13 +3,13 @@
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'ydim/debitor'
-require 'flexmock'
 require 'date'
 
 module YDIM
-	class TestDebitor < Test::Unit::TestCase
+	class TestDebitor < Minitest::Test
     include FlexMock::TestCase
 		def setup
 			@debitor = Debitor.new(1)

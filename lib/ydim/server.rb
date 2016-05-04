@@ -123,7 +123,7 @@ module YDIM
 			@sessions = []
 		end
 		def login(client, name=nil, &block)
-			@serv.logger.debug(client.__drburi) { 'attempting login' }
+			@serv.logger.debug(client.__drburi) { "attempting login" }
 			session = @serv.auth_server.authenticate(name, &block)
 			session.serv = @serv
 			session.client = client

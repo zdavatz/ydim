@@ -4,13 +4,13 @@
 $: << File.dirname(__FILE__)
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'stub/odba'
-require 'flexmock'
 require 'ydim/factory'
 
 module YDIM
-	class TestFactory < Test::Unit::TestCase
+	class TestFactory < Minitest::Test
     include FlexMock::TestCase
 		def setup
       @id_server = flexmock('IdServer')
@@ -39,7 +39,7 @@ module YDIM
 				dinvs
 			}
 			invoice = nil
-			assert_nothing_raised { invoice = @factory.create_invoice(debitor) }
+			invoice = @factory.create_invoice(debitor)
 			assert_instance_of(Invoice, invoice)
     end
 		def test_create_autoinvoice
@@ -61,8 +61,7 @@ module YDIM
 				dinvs
 			}
 			invoice = nil
-			assert_nothing_raised {
-        invoice = @factory.create_autoinvoice(debitor) }
+			invoice = @factory.create_autoinvoice(debitor)
 			assert_instance_of(AutoInvoice, invoice)
 	end
     def test_generate_invoice

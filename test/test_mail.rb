@@ -3,12 +3,12 @@
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
-require 'ydim/mail'
+require 'minitest/autorun'
 require 'flexmock/test_unit'
+require 'ydim/mail'
 
 module YDIM
-  class TestMail < Test::Unit::TestCase
+  class TestMail < Minitest::Test
     include FlexMock::TestCase
     def setup_config
       config = flexmock('Config')

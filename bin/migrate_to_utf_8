@@ -1,0 +1,201 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+puts "#{Time.now}: Loading #{__FILE__}"
+STDOUT.sync = true
+
+begin
+require 'pry'
+rescue LoadError
+end
+
+$: << File.expand_path(File.join(File.dirname(__FILE__), 'lib'))
+require 'logger'
+require 'needle'
+require 'odba/id_server'
+require 'rrba/server'
+require 'ydim/autoinvoicer'
+require 'ydim/client'
+require 'ydim/currency_converter'
+require 'ydim/currency_updater'
+require 'ydim/factory'
+require 'ydim/root_user'
+require 'ydim/server'
+require 'ydim/util'
+require 'odba/18_19_loading_compatibility'
+
+require 'odba/connection_pool'
+require 'odba/drbwrapper'
+require 'ydim/odba'
+require 'ydim/root_session'
+require 'ydim/root_user'
+
+module YDIM
+  class Server
+    # http://stackoverflow.com/questions/2982677/ruby-1-9-invalid-byte-sequence-in-utf-8
+    # https://robots.thoughtbot.com/fight-back-utf-8-invalid-byte-sequences
+    def sanitize_utf8(string)
+      return nil if string.nil?
+      # return string.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      return string if string.valid_encoding?
+      if string.force_encoding(Encoding::ISO_8859_1).valid_encoding?
+        string.force_encoding(Encoding::ISO_8859_1).clone.encode(Encoding::UTF_8)
+      else
+        string.chars.select { |c| c.valid_encoding? }.join
+      end
+    end
+    def _migrate_to_utf8 queue, table, opts={}
+      while obj = queue.shift do
+        if obj.is_a?(Numeric)
+          begin
+            obj = ODBA.cache.fetch obj
+          rescue ODBA::OdbaError
+            return
+          end
+        else
+          obj = obj.odba_instance
+        end
+        puts " #{__LINE__}: Migrating #{obj.class} #{obj.to_s}" if $VERBOSE
+        return unless obj
+        _migrate_obj_to_utf8 obj, queue, table, opts
+        obj.odba_store unless obj.odba_unsaved?
+      end
+    end
+    def _migrate_obj_to_utf8 obj, queue, table, opts={}
+      obj.instance_variables.each do |name|
+        child = obj.instance_variable_get name
+        if child.respond_to?(:odba_unsaved?) && !child.odba_unsaved? \
+          && obj.respond_to?(:odba_serializables) \
+          && obj.odba_serializables.include?(name)
+          child.instance_variable_set '@odba_persistent', nil
+        end
+        child = _migrate_child_to_utf8 child, queue, table, opts
+        obj.instance_variable_set name, child
+      end
+      if obj.is_a?(Array)
+        obj.collect! do |child|
+          _migrate_child_to_utf8 child, queue, table, opts
+        end
+      end
+      if obj.is_a?(Hash)
+        obj.dup.each do |key, child|
+          obj.store key, _migrate_child_to_utf8(child, queue, table, opts)
+        end
+      end
+      obj
+    end
+    def _migrate_child_to_utf8 child, queue, table, opts={}
+      @serialized ||= {}
+      case child
+      when ODBA::Persistable, ODBA::Stub
+        if child = child.odba_instance
+          if child.odba_unsaved?
+            _migrate_to_utf8 [child], table, opts
+          elsif opts[:all]
+            odba_id = child.odba_id
+            unless table[odba_id]
+              table.store odba_id, true
+              queue.push odba_id
+            end
+          end
+        end
+      when String
+        old = child.encoding
+        if ( child.encoding != Encoding::UTF_8 && child.force_encoding(Encoding::ISO_8859_1).valid_encoding? ) ||
+           ( child.encoding == Encoding::UTF_8 && !child.valid_encoding? )
+          child = child.force_encoding(Encoding::ISO_8859_1).clone.encode(Encoding::UTF_8)
+          puts "force_encoding from ISO_8859_1 #{old}. is now #{child}"
+        end
+        binding.pry unless child.valid_encoding?
+        case child.encoding.to_s
+        when /ASCII-8BIT|US-ASCII/
+          # nothing todo
+        when /UTF-8/
+          puts "UTF-8: for #{child.to_s}" if $VERBOSE
+          child = sanitize_utf8(child)
+        when /ISO-8859-1/i
+          child = sanitize_utf8(child)
+          # child = child.force_encoding('UTF-8')
+          puts "force_encoding from #{old}. is now #{child}"
+        else
+          puts "Unhandeled encoding #{child.encoding}"
+          # require 'pry'; binding.pry
+        # child = child.force_encoding
+        end
+      when
+        YDIM::AutoInvoice,
+        YDIM::Debitor,
+        YDIM::Debitor,
+        YDIM::Invoice,
+        YDIM::Invoice::Info,
+        YDIM::Item
+        child = _migrate_obj_to_utf8 child, queue, table, opts
+      when Float, Fixnum, TrueClass, FalseClass, NilClass,
+        Symbol, Time, Date, DateTime,
+        YDIM::Factory,
+        YDIM::CurrencyConverter,
+        YDIM::MobileCurrencyConverter
+        # do nothing
+      else
+        @ignored ||= {}
+        unless @ignored[child.class]
+          @ignored.store child.class, true
+          warn "ignoring #{child.class}"
+        end
+      end
+      child
+    rescue SystemStackError
+      puts child.class
+      raise
+    end
+  end
+end
+
+puts "#{Time.now}: Calling migrate_to_utf8"
+@logger = Logger.new('migrate_to_utf8.log')
+@logger.level = Logger::DEBUG
+config = YDIM::Server.config
+
+ODBA.storage.dbi = ODBA::ConnectionPool.new(config.db_driver_url,
+  config.db_user, config.db_auth, :client_encoding => 'LATIN1')
+ODBA.cache.setup
+
+DRb.install_id_conv ODBA::DRbIdConv.new
+
+if false
+server = YDIM::Server.new(config, logger)
+server.extend(DRbUndumped)
+
+puts config.inspect
+if(config.detach)
+  pidfile = '/var/run/ydimd.pid'
+  File.open(pidfile, 'w') { |fh| fh.puts $$ }
+  at_exit { File.unlink(pidfile) }
+  Process.fork and exit!(0)
+end
+
+begin
+  url = config.server_url
+  url.untaint
+  DRb.start_service(url, server)
+  $SAFE = 1
+  logger.info('start') {
+    sprintf("starting ydim-server on %s", config.server_url) }
+  DRb.thread.join
+rescue Exception => error
+  logger.error('fatal') { error }
+  raise
+end
+end
+
+@server = YDIM::Server.new(config, @logger)
+@server.extend(DRbUndumped)
+session = YDIM::RootSession.new(YDIM::RootUser.new(1))
+session.serv = @server
+{ :autoinvoices => session.autoinvoices,
+  :invoices => session.invoices,
+  :debitors => session.debitors,
+  }.each do |name, to_migrate|
+  puts "#{Time.now}: Start migrating #{name}"
+  @server._migrate_to_utf8(to_migrate, {})
+end
+puts "#{Time.now}: Finished migrate_to_utf8"

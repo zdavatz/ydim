@@ -3,13 +3,13 @@
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 $: << File.expand_path('..', File.dirname(__FILE__))
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'test/stub/odba'
-require 'flexmock'
 require 'ydim/server'
 
 module YDIM
-	class TestServer < Test::Unit::TestCase
+	class TestServer < Minitest::Test
 		def setup
 			@config = FlexMock.new
 			@config.should_receive(:autoinvoice_hour).and_return { nil }
@@ -35,9 +35,7 @@ module YDIM
 				fh.puts(key.public_key.to_s)
 			}
 			auth_server = nil
-			assert_nothing_raised {
-				auth_server = @needle.auth_server
-			}
+			auth_server = @needle.auth_server
 			assert_instance_of(RRBA::Server, auth_server)
 			root = auth_server.instance_variable_get('@root')
 			assert_equal('Root', root.name)
@@ -60,9 +58,7 @@ module YDIM
 				fh.puts(key.public_key.to_s)
 			}
 			auth_server = nil
-			assert_nothing_raised {
-				auth_server = @needle.auth_server
-			}
+			auth_server = @needle.auth_server
 			assert_instance_of(RRBA::Server, auth_server)
 			root = auth_server.instance_variable_get('@root')
 			assert_equal('Root', root.name)
@@ -80,9 +76,7 @@ module YDIM
 			}
 			@config.should_receive(:conf_dir).and_return { @datadir }
 			auth_server = nil
-			assert_nothing_raised {
-				auth_server = @needle.auth_server
-			}
+			auth_server = @needle.auth_server
 			assert_instance_of(RRBA::Server, auth_server)
 			root = auth_server.instance_variable_get('@root')
 			assert_equal('Root', root.name)
