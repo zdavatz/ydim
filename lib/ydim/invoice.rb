@@ -69,6 +69,17 @@ module YDIM
 				@date + @payment_period.to_i
 			end
 		end
+    def date
+      if !@date || @date.year < 0
+        if @date && @items.first && @items.first.time
+          @date = Date.new(@items.first.time.year, @items.first.time.month, @items.first.time.day)
+        else
+          @date  = Date.today
+        end
+      else
+        @date
+      end
+    end
     def empty?
       @items.empty?
     end

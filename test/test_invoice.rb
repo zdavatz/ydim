@@ -3,12 +3,12 @@
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
-require 'test/unit'
-require 'flexmock'
+require 'minitest/autorun'
+require 'flexmock/test_unit'
 require 'ydim/invoice'
 
 module YDIM
-	class TestInvoice < Test::Unit::TestCase
+	class TestInvoice < Minitest::Test
     include FlexMock::TestCase
 		def setup
 			@invoice = Invoice.new(23)
@@ -96,8 +96,18 @@ module YDIM
       @invoice.items.push(item)
       assert_equal(false, @invoice.empty?)
     end
+    def test_date_must_be_current
+      refute_nil(@invoice.date, 'A new invoice must have the current year by default')
+      assert_equal(Date.today.year, @invoice.date.year)
+    end
+    def test_date_must_be_fixed
+      @invoice.date= Date.new(-4712, 1, 1)
+      item = Item.new({:time => Time.now})
+      @invoice.add_item(Item.new({:time => Time.now}))
+      assert_equal(Date.today.year, @invoice.date.year)
+    end
 	end
-  class TestAutoInvoice < Test::Unit::TestCase
+  class TestAutoInvoice < Minitest::Test
 		def setup
 			@invoice = AutoInvoice.new(23)
 		end
