@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# encoding: utf-8
+
 # TestInvoice -- ydim -- 11.01.2006 -- hwyss@ywesee.com
 
 $: << File.expand_path('../lib', File.dirname(__FILE__))
@@ -11,17 +13,17 @@ module YDIM
 	class TestInvoice < Minitest::Test
     include FlexMock::TestCase
 		def setup
-			@invoice = Invoice.new(23)
+      @invoice = Invoice.new(23)
 		end
 		def test_add_item
 			assert_equal([], @invoice.items)
 			item_id = 0
-			item = FlexMock.new
-			item.should_receive(:index=, 2).and_return { |idx|
-				assert_equal(item_id, idx)
-				item_id += 1
-			}
-			retval = @invoice.add_item(item)
+      item = FlexMock.new
+      item.should_receive(:index=, 2).and_return { |idx|
+        assert_equal(item_id, idx)
+        item_id += 1
+      }
+      retval = @invoice.add_item(item)
 			assert_equal([item], @invoice.items)
 			assert_equal(item, retval)
 			retval = @invoice.add_item(item)
@@ -62,18 +64,52 @@ module YDIM
 			assert_nil(@invoice.due_date)
 		end
 		def test_pdf_invoice
-			debitor = FlexMock.new
-			debitor.should_receive(:add_invoice, 1).and_return { |arg|
-				assert_equal(@invoice, arg)
-			}
-			debitor.should_receive(:address).and_return { ['address'] }
-			@invoice.debitor = debitor
-			@invoice.description = 'description'
-			pdf = @invoice.pdf_invoice
-			assert_instance_of(PdfInvoice::Invoice, pdf)
-			assert_equal(['address'], pdf.debitor_address)
-			assert_equal(23, pdf.invoice_number)
-			assert_equal('description', pdf.description)
+      @invoice = Invoice.new(23)
+
+      debitor = FlexMock.new
+      debitor.should_receive(:add_invoice, 1).and_return { |arg|
+        assert_equal(@invoice, arg)
+      }
+      debitor.should_receive(:address).and_return { ['address'] }
+      @invoice.debitor = debitor
+      @invoice.description = 'description'
+      item = flexmock('item')
+      item_id = 0
+      item.should_receive(:index=).and_return { |idx| item_id += 1 }
+      item.should_receive(:vat_rate).and_return(7.6)
+      item.should_receive(:text).and_return('item text')
+      item.should_receive(:unit).and_return('hours')
+      item.should_receive(:quantity).and_return(3)
+      item.should_receive(:price).and_return(13)
+      item.should_receive(:vat).and_return(4)
+      @invoice.date = Date.new(2015, 1, 30)
+      item.should_receive(:time).and_return( @invoice.date.to_time)
+      @invoice.add_item(item)
+      user_pdfinvoice = File.join(Dir.home, '.pdfinvoice')
+      FileUtils.rm_rf(user_pdfinvoice)
+      FileUtils.makedirs(user_pdfinvoice)
+      FileUtils.cp(File.join(File.dirname(__FILE__), 'data', 'config.yml'), user_pdfinvoice)
+      FileUtils.cp(File.join(File.dirname(__FILE__), 'data', 'logo.png'), '/tmp/ywesee_logo.png')
+      pdf = @invoice.pdf_invoice({})
+      assert_instance_of(PdfInvoice::Invoice, pdf)
+      pdf_output = 'tst.pdf'
+      pdf_as_txt = 'tst.txt'
+      FileUtils.rm(pdf_output) if File.exist?(pdf_output)
+      FileUtils.rm(pdf_as_txt) if File.exist?(pdf_as_txt)
+      content = pdf.to_pdf
+      File.open(pdf_output, 'w+') {|f| f.write content } if $VERBOSE
+      assert_match(/Bedingungen/, content)
+      assert_match(/Rechnung 23/, content)
+      assert_match(/30.01.2015/, content)
+      assert_match(/Clearing/, content)
+      assert_match(/Beschreibung/, content)
+      assert_match(/Ohne Ihre Gegenmeldung/, content)
+      assert_match(/Mit freundlichen/, content)
+      assert_match(/MwSt/, content)
+      assert_equal(['address'], pdf.debitor_address)
+      assert_equal(23, pdf.invoice_number)
+      assert_equal('description', pdf.description)
+      assert(content.size > 10000, "PDF output must be > 10 Kb, or the Logo is missing. Is #{content.size} bytes. ")
 		end
 		def test_status
 			@invoice.date = Date.today

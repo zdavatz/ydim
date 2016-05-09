@@ -1,0 +1,44 @@
+--- 
+# encoding: utf-8
+creditor_email: zdavatz@ywesee.com
+creditor_address: |
+ ywesee GmbH
+ Winterthurerstrasse 52
+ CH-8006 Zürich
+ Schweiz
+creditor_bank: |
+ MwSt-Nummer: CHE-112.233.959 MWST
+ UBS-Römerhof Zürich
+ Kontonummer: 830024.01Z, Clearingnummer: 251
+ IBAN: CH870025125183002401Z
+ BIC: UBSWCHZH80A
+due_days: "Bedingungen: zahlbar in 10 Tagen"
+logo_path: /tmp/ywesee_logo.png
+formats:
+ currency: '%1.2f'
+ date: '%d.%m.%Y'
+ invoice_number: "<b>Rechnung %s</b>"
+ quantity: '%1.1f'
+ total: 'CHF %1.2f'
+logo_link: 
+ :type: :external
+ :target: http://www.ywesee.com
+tax: 0.080
+texts:
+ date: Datum
+ description: Beschreibung
+ unit: Einheit
+ quantity: Anzahl
+ price: Preis
+ item_total: Betrag
+ subtotal: Zwischensumme
+ tax: MwSt 8.0%
+ thanks: |
+  Ohne Ihre Gegenmeldung erfolgt der Rechnungsversand nur per Email.
+  Thank you for your patronage!
+  
+  Mit freundlichen Grüssen
+  Zeno Davatz
+  zdavatz@ywesee.com
+  043 540 05 50
+ total: Fälliger Betrag

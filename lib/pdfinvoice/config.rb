@@ -5,7 +5,7 @@ require 'rclconf'
 
 module PdfInvoice
 	def PdfInvoice.config(argv=[])
-		default_dir = File.join(ENV['HOME'].to_s, '.pdfinvoice')
+		default_dir = File.join(Dir.home, '.pdfinvoice')
 		default_config_files = [
 			File.join(default_dir, 'config.yml'),
 			'/etc/pdfinvoice/config.yml',
@@ -16,7 +16,7 @@ module PdfInvoice
 				'total'						=> [0xF0, 0xF0, 0xF0],	
 			},
 			'config'						=> default_config_files,
-			'creditor_address'	=> '',
+			'creditor_address'	=> "Please set creditor_address etc in: #{default_config_files}",
 			'creditor_email'		=> '',
 			'creditor_bank'			=> '',
 			'due_days'					=> '',
