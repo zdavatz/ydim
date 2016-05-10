@@ -1,3 +1,7 @@
+=== 1.0.3 / 10.05.2016
+
+* Moved bin/ydim* to lib/ydim/ to make the executables work
+
 === 1.0.2 / 10.05.2016
 
 * Bumped version to 1.0.2, because we still had an unwanted dependency to dbi = 0.4.6
