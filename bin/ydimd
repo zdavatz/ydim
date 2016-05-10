@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby231
 # ypdmd -- ydim -- 12.01.2005 -- hwyss@ywesee.com
 
 require 'yaml'
