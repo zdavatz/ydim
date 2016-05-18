@@ -195,7 +195,7 @@ session.serv = @server
   :invoices => session.invoices,
   :debitors => session.debitors,
   }.each do |name, to_migrate|
-  puts "#{Time.now}: Start migrating #{name}"
+  puts "#{Time.now}: Start migrating #{to_migrate.size} #{name}"
   @server._migrate_to_utf8(to_migrate, {})
 end
 puts "#{Time.now}: Finished migrate_to_utf8"
