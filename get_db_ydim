@@ -1,0 +1,29 @@
+#!/bin/bash -v
+set -x
+DB_NAME=ydim
+
+yyyy=`date -d '1 days ago' +"%Y"`
+mm=`date -d '1 days ago' +"%m"`
+dd=`date -d '1 days ago' +"%d"`
+DB_DUMP=/var/backup/fast/db_dumps/${DB_NAME}.$yyyy$mm$dd.sql.gz
+
+
+m=(dummy January February March April May June July August September October November December)
+nm=`expr $mm + 0`
+cd /var/backup/fast/db_dumps/
+cmd="scp ywesee@ywesee.com:/var/backup/thinpower/db/postgresql/${m[nm]}-$yyyy/$yyyy-$mm-$dd/22\:00-postgresql_database-${DB_NAME}-backup.gz ${DB_NAME}.$yyyy$mm$dd.sql.gz"
+echo Calling $cmd
+$cmd
+ls -l $DB_DUMP
+sudo -u postgres dropdb $DB_NAME
+
+sudo -u postgres createdb -E UTF8 -T template0 $DB_NAME
+if [ $? -ne 0 ] ; then exit 1; fi
+if [ ! -f $DB_DUMP ] 
+then
+  echo "Cannot find $DB_DUMP. Have look at the get_db_dumps.rb script or get it directly from"
+  exit 1
+fi
+
+zcat $DB_DUMP | sudo -u postgres psql $DB_NAME
+if [ $? -ne 0 ] ; then exit 1; fi
