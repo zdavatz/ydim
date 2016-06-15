@@ -150,42 +150,16 @@ module YDIM
   end
 end
 
-puts "#{Time.now}: Calling migrate_to_utf8"
-@logger = Logger.new('migrate_to_utf8.log')
+@logger = Logger.new("/tmp/#{File.basename(__FILE__)}.log")
+@logger.info  "#{Time.now}: Calling  #{File.basename(__FILE__)}"
 @logger.level = Logger::DEBUG
 config = YDIM::Server.config
+@logger.info  "user: #{config.db_user} auth: #{config.db_auth}"
 
-ODBA.storage.dbi = ODBA::ConnectionPool.new(config.db_driver_url,
-  config.db_user, config.db_auth, :client_encoding => 'LATIN1')
+ODBA.storage.dbi = ODBA::ConnectionPool.new(config.db_driver_url, config.db_user, config.db_auth, :client_encoding => 'LATIN1')
 ODBA.cache.setup
 
 DRb.install_id_conv ODBA::DRbIdConv.new
-
-if false
-server = YDIM::Server.new(config, logger)
-server.extend(DRbUndumped)
-
-puts config.inspect
-if(config.detach)
-  pidfile = '/var/run/ydimd.pid'
-  File.open(pidfile, 'w') { |fh| fh.puts $$ }
-  at_exit { File.unlink(pidfile) }
-  Process.fork and exit!(0)
-end
-
-begin
-  url = config.server_url
-  url.untaint
-  DRb.start_service(url, server)
-  $SAFE = 1
-  logger.info('start') {
-    sprintf("starting ydim-server on %s", config.server_url) }
-  DRb.thread.join
-rescue Exception => error
-  logger.error('fatal') { error }
-  raise
-end
-end
 
 @server = YDIM::Server.new(config, @logger)
 @server.extend(DRbUndumped)
@@ -198,4 +172,4 @@ session.serv = @server
   puts "#{Time.now}: Start migrating #{to_migrate.size} #{name}"
   @server._migrate_to_utf8(to_migrate, {})
 end
-puts "#{Time.now}: Finished migrate_to_utf8"
+@logger.info  "#{Time.now}: Finished #{File.basename(__FILE__)}"
