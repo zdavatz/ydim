@@ -24,7 +24,7 @@ module YDIM
 			assert_equal(7.6, item.vat_rate)
 			assert_equal({}, item.data)
 			assert_equal(time, item.time)
-			assert_equal(nil, item.expiry_time)
+			assert_nil(item.expiry_time)
 		end
 		def test_total_netto
 			item = Item.new

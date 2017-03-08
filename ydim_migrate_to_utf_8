@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# encoding: utf-8
+#encoding: ASCII-8BIT
 puts "#{Time.now}: Loading #{__FILE__}"
 STDOUT.sync = true
 

@@ -6,10 +6,15 @@ $: << File.expand_path('../lib', File.dirname(__FILE__))
 require 'minitest/autorun'
 require 'flexmock/test_unit'
 require 'ydim/mail'
-
 module YDIM
   class TestMail < Minitest::Test
     include FlexMock::TestCase
+    def setup
+      ::Mail.defaults do
+        delivery_method :test
+      end
+      ::Mail::TestMailer.deliveries.clear
+    end
     def setup_config
       config = flexmock('Config')
       config.should_receive(:mail_body).and_return <<-MAIL
@@ -42,11 +47,12 @@ module YDIM
       debitor.should_receive(:contact).and_return('Melanie Esterhazy')
       invoice = flexmock('Invoice')
       invoice.should_receive(:description).and_return('Description')
-      body = Mail.body(setup_config, debitor, invoice)
-      assert_equal <<-EXPECTED, body
-        Sehr geehrte Frau Melanie Esterhazy
+      assert_equal(0, ::Mail::TestMailer.deliveries.size)
+      res = Mail.body(setup_config, debitor, invoice)
+      expected = %(        Sehr geehrte Frau Melanie Esterhazy
         Description
-      EXPECTED
+)
+      assert_equal(expected, res)
     end
     def test_send_invoice
       debitor = flexmock('Debitor')
@@ -60,16 +66,13 @@ module YDIM
       invoice.should_receive(:unique_id).and_return(12345)
       invoice.should_receive(:description).and_return('Description')
       invoice.should_receive(:to_pdf).times(1).and_return('pdf-document')
-      smtp = flexmock('SMTP')
-      flexstub(Net::SMTP).should_receive(:new).and_return(smtp)
-      smtp.should_receive(:start)
-      smtp.should_receive(:sendmail).with(String,
-        'smtp@ywesee.com', 'cc@ywesee.com').and_return { assert(true) }
-      smtp.should_receive(:sendmail).with(String,
-        'smtp@ywesee.com', 'test@ywesee.com').and_return { assert(true) }
-      smtp.should_receive(:sendmail).with(String,
-        'smtp@ywesee.com', 'test.cc@ywesee.com').and_return { assert(true) }
+      assert_equal(0, ::Mail::TestMailer.deliveries.size)
       Mail.send_invoice(setup_config, invoice)
+      assert_equal(1, ::Mail::TestMailer.deliveries.size)
+      assert_equal("        Sehr geehrter Herr Contact-Name\n" +
+                   "        Description\n",
+                   ::Mail::TestMailer.deliveries.first.body.to_s)
+      assert_equal('Rechnung Company-Name #12345, Description', ::Mail::TestMailer.deliveries.first.subject)
     end
     def test_send_reminder
       debitor = flexmock('Debitor')
@@ -84,16 +87,11 @@ module YDIM
       invoice.should_receive(:description).and_return('Description')
       invoice.should_receive(:reminder_subject).and_return('Reminder')
       invoice.should_receive(:reminder_body).and_return('Reminder Body')
-      smtp = flexmock('SMTP')
-      flexstub(Net::SMTP).should_receive(:new).and_return(smtp)
-      smtp.should_receive(:start)
-      smtp.should_receive(:sendmail).with(String,
-        'smtp@ywesee.com', 'cc@ywesee.com').and_return { assert(true) }
-      smtp.should_receive(:sendmail).with(String,
-        'smtp@ywesee.com', 'test@ywesee.com').and_return { assert(true) }
-      smtp.should_receive(:sendmail).with(String,
-        'smtp@ywesee.com', 'test.cc@ywesee.com').and_return { assert(true) }
+      assert_equal(0, ::Mail::TestMailer.deliveries.size)
       Mail.send_reminder(setup_config, invoice)
+      assert_equal(1, ::Mail::TestMailer.deliveries.size)
+      assert_equal("Reminder Body", ::Mail::TestMailer.deliveries.first.body.to_s)
+      assert_equal('Reminder',      ::Mail::TestMailer.deliveries.first.subject)
     end
   end
 end
