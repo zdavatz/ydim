@@ -18,6 +18,8 @@ end
 task :spec => :clean
 require 'rake/testtask'
 
+task :default => [:clobber, :test, :gem]
+
 dir = File.dirname(__FILE__)
 Rake::TestTask.new do |t|
   t.libs << 'test'
