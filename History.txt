@@ -1,3 +1,7 @@
+=== 1.0.4 / 08.03.2017
+
+* Using mail gem instead of rmail. Updated tests.
+
 === 1.0.3 / 10.05.2016
 
 * Moved bin/ydim* to lib/ydim/ to make the executables work
