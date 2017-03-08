@@ -1,3 +1,7 @@
+=== 1.0.5 / 08.03.2017
+
+* Fixed loading bin/ydimd
+
 === 1.0.4 / 08.03.2017
 
 * Using mail gem instead of rmail. Updated tests.

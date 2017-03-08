@@ -1,17 +1,18 @@
 #!/usr/bin/env ruby
 
-require 'ydim/server' # to pick up the configuration
+require 'ydim/server_config' # to pick up the configuration
 require 'mail'
 
 module YDIM
   module Mail
+    config = YDIM::Server.config
     ::Mail.defaults do
       delivery_method :smtp, {
-        :address => Server.config.smtp_server,
-        :port => Server.config.smtp_port,
-        :domain => Server.config.smtp_domain,
-        :user_name => Server.config.smtp_user,
-        :password => Server.config.smtp_pass,
+        :address => config.smtp_server,
+        :port => config.smtp_port,
+        :domain => config.smtp_domain,
+        :user_name => config.smtp_user,
+        :password => config.smtp_pass,
       }
     end
     def Mail.body(config, debitor, invoice)
