@@ -116,7 +116,7 @@ module PdfInvoice
 				}
 				table.data = @items.collect { |line|
 					item_total = line.at(3).to_f * line.at(4).to_f
-          vat += line[5] || @config.tax.to_f * item_total
+          vat += line[5] || (@config.vat_rate.to_f * item_total / 100)
 					total += item_total
 					date = line.at(0).strftime(@config.formats['date'])
 					cw = pdf.text_width(date) * PDF::SimpleTable::WIDTH_FACTOR

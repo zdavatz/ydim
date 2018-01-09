@@ -31,7 +31,6 @@ module PdfInvoice
 			},
 			'logo_path'					=> nil,
 			'logo_link'					=> nil,
-			'tax'								=> 0,
 			'texts'							=> {
 				'date'						=> 'Date',	
 				'description'			=> 'Description',
