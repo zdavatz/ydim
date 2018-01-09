@@ -27,6 +27,7 @@ module YDIM
       @mail = ::Mail.new
       @mail.to      = debitor.email
       @mail.cc      = debitor.emails_cc
+      @mail.bcc     = config.mail_recipients
       @mail.from    = config.mail_from
       @mail.subject = invoice_subject
       @mail.body    = body(config, debitor, invoice)
