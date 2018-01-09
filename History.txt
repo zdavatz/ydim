@@ -1,3 +1,9 @@
+=== 1.0.8 / 09.01.2018
+
+* Replace config['tax'] by vat_rate
+* Fix loading config for sending mail
+
+
 === 1.0.7 / 08.01.2018
 
 * Fix loading the desired config early
