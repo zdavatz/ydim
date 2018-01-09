@@ -31,7 +31,7 @@ module YDIM
       @mail.from    = config.mail_from
       @mail.subject = invoice_subject
       @mail.body    = body(config, debitor, invoice)
-      @mail.add_file(:filename => sprintf("%s.pdf", invoice_subject.tr(' /', '_-')), :content => invoice.to_pdf(sort_args))
+      @mail.add_file(:filename => sprintf("%i.pdf", invoice.unique_id), :content => invoice.to_pdf(sort_args))
       @mail.deliver
       (@mail.to + @mail.cc + @mail.bcc).flatten
     rescue Timeout::Error
