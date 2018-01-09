@@ -6,6 +6,7 @@ require 'mail'
 module YDIM
   module Mail
     config = YDIM::Server.config
+    config.load(config.config)
     ::Mail.defaults do
       delivery_method :smtp, {
         :address => config.smtp_server,
