@@ -1,3 +1,9 @@
+=== 1.1.0 / 09.01.2018
+
+* Send correct e-mail body
+* Correct name of attached pdf file
+* Return correct number of recipients
+
 === 1.0.9 / 09.01.2018
 
 * Send copy of email invoice to config.mail_recipients
