@@ -31,9 +31,11 @@ module YDIM
       @mail.from    = config.mail_from
       @mail.subject = invoice_subject
       @mail.body    = body(config, debitor, invoice)
-      @mail.attachments['myfile.pdf'] = { :mime_type => 'application/x-pdf',
-                                    :content => invoice.to_pdf(sort_args) }
+      @mail.attachments[sprintf("%s.pdf", invoice_subject.tr(' /', '_-'))] =
+          { :mime_type => 'application/x-pdf',
+            :content => invoice.to_pdf(sort_args) }
       @mail.deliver
+      (@mail.to + @mail.cc + @mail.bcc).flatten
     rescue Timeout::Error
       retries ||= 3
       if retries > 0
