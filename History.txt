@@ -1,3 +1,7 @@
+=== 1.0.7 / 08.01.2018
+
+* Fix loading the desired config early
+
 === 1.0.6 / 08.01.2018
 
 * Changed vat_rate to 7.7 for switzerland
