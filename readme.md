@@ -10,6 +10,15 @@ ywesee distributed invoice manager, Ruby
 
 * gem install ydim
 
+If you have a non standard path of postgres use something like
+
+* gem install pg -- --with-pg-config=/usr/local/pgsql-10.1/bin/pg_config
+
+Or if you are using bundler
+
+* bundle config build.pg --with-pg-config=/usr/local/pgsql-10.1/bin/pg_config
+* bundle install
+
 ## Migrating an old database
 
 An old database can be migrated to UTF-8 by calling
