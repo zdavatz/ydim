@@ -18,8 +18,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "odba",    '>= 1.1.2'
-  spec.add_dependency "ydbd-pg", '>= 0.5.1'
-  spec.add_dependency "ydbi",    '>= 0.5.1'
+  spec.add_dependency "ydbd-pg", '>= 0.5.5'
+  spec.add_dependency "ydbi",    '>= 0.5.5'
   spec.add_dependency "syck"
   spec.add_dependency "mail"
   spec.add_dependency "rclconf"

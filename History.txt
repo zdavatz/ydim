@@ -1,3 +1,7 @@
+=== 1.1.1/ 23.01.2018
+
+* Update to ydbi 0.5.6 to avoid error with PGconn
+
 === 1.1.0 / 09.01.2018
 
 * Send correct e-mail body
