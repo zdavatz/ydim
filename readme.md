@@ -6,6 +6,12 @@
 
 ywesee distributed invoice manager, Ruby
 
+## Install Ruby
+
+* git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+* echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bashrc
+* git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+
 ## INSTALL:
 
 * gem install ydim
