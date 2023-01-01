@@ -19,6 +19,14 @@ ywesee distributed invoice manager, Ruby
 * sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/postgresql-pgdg.list &gt; /dev/null
 * sudo apt-get install postgresql-10
 * sudo -u postgres psql -c 'create role ydim;'
+* `sudo su`
+* `su - postgres`
+* `dropdb ydim`
+* `createdb ydim`
+* -> check DB
+* `psql`
+*  `\l` 
+* `bzcat 22:00-postgresql_database-ch_oddb-backup.bz2 | sudo -u postgres psql -p 5433 ydim`
 ```
 ## INSTALL:
 
