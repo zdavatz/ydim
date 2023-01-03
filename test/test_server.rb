@@ -30,7 +30,7 @@ module YDIM
 			@config.should_receive(:root_key).and_return { "root_dsa.pub" }
 			@config.should_receive(:conf_dir).and_return { @datadir }
 			filepath = File.join(@datadir, "root_dsa.pub")
-			key = OpenSSL::PKey::DSA.new(8)
+			key = OpenSSL::PKey::DSA.new(1024)
 			File.open(filepath, 'w') { |fh|
 				fh.puts(key.public_key.to_s)
 			}
@@ -53,7 +53,7 @@ module YDIM
 			}
 			@config.should_receive(:conf_dir).and_return { @datadir }
 			filepath = File.join(@datadir, "absolute_dsa.pub")
-			key = OpenSSL::PKey::DSA.new(8)
+			key = OpenSSL::PKey::DSA.new(1024)
 			File.open(filepath, 'w') { |fh|
 				fh.puts(key.public_key.to_s)
 			}
@@ -68,7 +68,7 @@ module YDIM
 			FileUtils.rm_r(@datadir) if File.exist?(@datadir)
 		end
 		def test_root_user__dump
-			key = OpenSSL::PKey::DSA.new(8)
+			key = OpenSSL::PKey::DSA.new(1024)
 			@config.should_receive(:root_name).and_return { 'Root' }
 			@config.should_receive(:root_email).and_return { 'test@ywesee.com' }
 			@config.should_receive(:root_key).and_return {
@@ -94,7 +94,7 @@ module YDIM
 			@logger.should_receive(:error).and_return { |msg, block|
 				error_messages << msg << "\n" }
 			@logger.should_receive(:error).and_return { |msg, block| flunk(msg) }
-			key = OpenSSL::PKey::DSA.new(8)
+			key = OpenSSL::PKey::DSA.new(1024)
 			@config.should_receive(:root_name).and_return { 'Root' }
 			@config.should_receive(:root_email).and_return { 'test@ywesee.com' }
 			@config.should_receive(:root_key).and_return {
@@ -118,7 +118,7 @@ module YDIM
 				info_messages << msg << "\n" }
 			@logger.should_receive(:error).and_return { |msg, block|
 				error_messages << msg << "\n" }
-			key = OpenSSL::PKey::DSA.new(8)
+			key = OpenSSL::PKey::DSA.new(1024)
 			@config.should_receive(:root_name).and_return { 'Root' }
 			@config.should_receive(:root_email).and_return { 'test@ywesee.com' }
 			@config.should_receive(:root_key).and_return {

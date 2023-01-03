@@ -69,10 +69,9 @@ module YDIM
       assert_equal(0, ::Mail::TestMailer.deliveries.size)
       Mail.send_invoice(setup_config, invoice)
       assert_equal(1, ::Mail::TestMailer.deliveries.size)
-      assert_equal("        Sehr geehrter Herr Contact-Name\n" +
-                   "        Description\n",
-                   ::Mail::TestMailer.deliveries.first.body.to_s)
       assert_equal('Rechnung Company-Name #12345, Description', ::Mail::TestMailer.deliveries.first.subject)
+      assert_match(/  Description/m, ::Mail::TestMailer.deliveries.first.body.parts.first.to_s)
+      assert_match(/  Sehr geehrter Herr Contact-Name/m, ::Mail::TestMailer.deliveries.first.body.parts.first.to_s)
     end
     def test_send_reminder
       debitor = flexmock('Debitor')
