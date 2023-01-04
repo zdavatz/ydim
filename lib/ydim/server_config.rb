@@ -7,7 +7,7 @@ require 'rclconf'
 
 module YDIM
 	class Server
-    ydim_default_dir = File.join(ENV['HOME'], '.ydim')
+    ydim_default_dir = File.join(ENV['HOME'] ? ENV['HOME'] : '.', '.ydim')
     default_config_files = [
       File.join(ydim_default_dir, 'ydimd.yml'),
       '/etc/ydim/ydimd.yml',
