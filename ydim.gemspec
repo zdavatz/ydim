@@ -17,6 +17,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+
+  spec.add_dependency 'net-smtp'
+  spec.add_dependency 'net-imap'
+  spec.add_dependency 'net-pop'
   spec.add_dependency "rexml"
   spec.add_dependency "odba",    '>= 1.1.2'
   spec.add_dependency "ydbd-pg", '>= 0.5.5'
@@ -28,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "ypdf-writer"
   spec.add_dependency "rrba"
   spec.add_dependency "hpricot"
+  spec.add_dependency "pkg-config"
   spec.add_runtime_dependency 'deprecated', '= 2.0.1'
 
   spec.add_development_dependency "bundler"

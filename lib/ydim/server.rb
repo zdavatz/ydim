@@ -3,7 +3,7 @@
 # YDIM::Server -- ydim -- 09.12.2011 -- mhatakeyama@ywesee.com
 # YDIM::Server -- ydim -- 10.01.2006 -- hwyss@ywesee.com
 
-require 'ydim/server_config'
+require_relative './server_config'
 require 'logger'
 require 'needle'
 require 'odba/id_server'

@@ -49,7 +49,6 @@ end
 
 begin
 	url = config.server_url
-	url.untaint
 	DRb.start_service(url, server)
 	$SAFE = 1
 	logger.info('start') { 
