@@ -26,7 +26,7 @@ ywesee distributed invoice manager, Ruby
 * -> check DB
 * psql
 *  \l
-* bzcat 22:00-postgresql_database-ch_oddb-backup.bz2 | sudo -u postgres psql -p 5433 ydim
+* bzcat 22:00-postgresql_database-ydim-backup.bz2 | sudo -u postgres psql -p 5433 ydim
 ```
 ## INSTALL:
 
