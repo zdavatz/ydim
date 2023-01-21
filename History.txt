@@ -1,3 +1,7 @@
+=== 1.1.4/ 21.01.2023
+
+* Read configuration values only from /etc/ydim
+
 === 1.1.1/ 23.01.2018
 
 * Update to ydbi 0.5.6 to avoid error with PGconn
