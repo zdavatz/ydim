@@ -8,10 +8,9 @@ require 'fileutils'
 module YDIM
 	class Client
 		home_dir = ENV['HOME'] || '/tmp'
-		ydim_default_dir = File.join(home_dir, '.ydim')
+		ydim_default_dir = '/etc/ydim'
 		default_config_files = [
 			File.join(ydim_default_dir, 'ydim.yml'),
-			'/etc/ydim/ydim.yml',
 		]
 		defaults = {
 			'client_url'					=> 'druby://localhost:0',
