@@ -1,3 +1,7 @@
+=== 1.1.5/ 21.01.2023
+
+* Read ALL configuration values only from /etc/ydim
+
 === 1.1.4/ 21.01.2023
 
 * Read configuration values only from /etc/ydim
