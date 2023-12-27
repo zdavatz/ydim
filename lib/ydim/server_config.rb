@@ -46,7 +46,7 @@ module YDIM
       'smtp_port'             => 587,
       'smtp_server'           => 'localhost',
       'smtp_user'             => 'ydim@ywesee.com',
-      'vat_rate'              => 7.7,
+      'vat_rate'              => 8.1,
     }
     CONFIG =  RCLConf::RCLConf.new(ARGV, defaults)
     def Server.config
