@@ -44,7 +44,7 @@ defaults = {
 	'root_key'							=> 'root_dsa',
 	'smtp_from'							=> '',
 	'smtp_server'						=> 'localhost',
-	'vat_rate'							=> 7.7,
+	'vat_rate'							=> 8.1,
 }
 config = RCLConf::RCLConf.new(ARGV, defaults)
 config.load(config.config)
