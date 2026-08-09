@@ -13,6 +13,11 @@ module YDIM
 			File.join(ydim_default_dir, 'ydim.yml'),
 		]
 		defaults = {
+			# IBANs of the accounts ydim invoices are paid into -- see
+			# camt_accounts in server_config.rb. ydim-camt reconciles these and
+			# nothing else, so that the private accounts in the same e-banking
+			# download are left alone.
+			'camt_accounts'				=> [],
 			'client_url'					=> 'druby://localhost:0',
 			'config'							=> default_config_files,
 			'private_key'					=> File.join(home_dir, '.ssh', 'id_dsa'),

@@ -15,6 +15,11 @@ module YDIM
       'autoinvoice_hour'      => 1,
       'config'                => default_config_files,
       'conf_dir'              => File.join(ydim_default_dir, 'conf'),
+      # IBANs of the accounts ydim invoices are paid into. The e-banking camt
+      # download also carries the private accounts, whose entries must never be
+      # matched against invoices, so leaving this empty disables reconciliation
+      # rather than reconciling against everything.
+      'camt_accounts'         => [],
       'currencies'            => ['CHF', 'EUR', 'USD'],
       'currency_update_hour'  => 2,
       'data_dir'              => File.join(ydim_default_dir, 'data'),

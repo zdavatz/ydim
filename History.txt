@@ -1,3 +1,15 @@
+=== 1.1.6 / 09.08.2026
+
+* Reconcile payments from ISO-20022 camt.053 bank statements (UBS Z53)
+  * ydim-camt reads a statement zip, directory or single xml and reports
+    which open invoices the credits settle; --apply books them
+  * RootSession#reconcile_camt and #mark_paid make this available over DRb
+  * new config camt_accounts: the IBANs ydim invoices are paid into. The
+    e-banking download also contains the private accounts, and reconciling
+    without this set is refused rather than guessed
+* Pin minitest below 6, which dropped the Minitest::Unit::TestCase shim that
+  flexmock/test_unit needs
+
 === 1.1.5/ 21.01.2023
 
 * Read ALL configuration values only from /etc/ydim

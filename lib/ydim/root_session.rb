@@ -7,6 +7,7 @@ require 'ydim/debitor'
 require 'ydim/invoice'
 require 'ydim/item'
 require 'ydim/mail'
+require 'ydim/reconciler'
 require 'odba'
 
 module YDIM
@@ -125,6 +126,51 @@ module YDIM
 			@serv.logger.debug(whoami) { "invoice_infos(#{status})" }
 			Invoice.search_by_status(status).collect { |inv| inv.info }
 		end
+    # The invoices a payment could still be settling. Both statuses are asked
+    # for because the status index is only refreshed once a day, so an invoice
+    # that has just fallen due may still be indexed as open.
+    def open_invoice_infos
+      @serv.logger.debug(whoami) { "open_invoice_infos" }
+      (Invoice.search_by_status('is_open') \
+        | Invoice.search_by_status('is_due')).collect { |inv| inv.info }
+    end
+    # Marks an invoice as paid. Stores the date the money was booked rather
+    # than a plain true, so that a later reconciliation run can tell an
+    # already-booked payment from a fresh one.
+    def mark_paid(invoice_id, date=Date.today)
+      @serv.logger.info(whoami) { "mark_paid(#{invoice_id}, #{date})" }
+      ODBA.transaction {
+        inv = invoice(invoice_id)
+        inv.payment_received = date
+        inv.odba_store
+        inv.info
+      }
+    end
+    # Matches booked bank credits against the invoice book. `entries` are
+    # YDIM::Camt::Entry objects, parsed client-side -- the daemon never needs
+    # to see the statement files. Read-only unless :apply is given, in which
+    # case only unambiguous matches (invoice number named *and* amount to the
+    # cent) are booked; everything else is left for a human.
+    def reconcile_camt(entries, opts={})
+      @serv.logger.info(whoami) {
+        "reconcile_camt(#{entries.size} entries, #{opts.inspect})" }
+      accounts = opts[:accounts] || @serv.config.camt_accounts
+      resolver = lambda { |id|
+        inv = Invoice.find_by_unique_id(id.to_s)
+        inv && inv.info
+      }
+      result = Reconciler.new(open_invoice_infos, accounts, resolver)\
+        .reconcile(entries)
+      if opts[:apply]
+        result.applicable.each { |match|
+          match.invoices.each { |info|
+            mark_paid(info.unique_id, match.entry.booking_date)
+          }
+          match.applied = true
+        }
+      end
+      result
+    end
 		def search_debitors(email_or_name)
 			@serv.logger.debug(whoami) { "search_debitors(#{email_or_name})" }
 			Debitor.search_by_exact_email(email_or_name) |

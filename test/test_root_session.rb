@@ -343,5 +343,114 @@ module YDIM
         @session.update_item(12, 4, {:foo => 'bar'}, :autoinvoice)
       }
     end
+    def test_mark_paid
+      inv = flexmock('invoice')
+      date = Date.new(2026, 7, 10)
+      inv.should_receive(:payment_received=).with(date).times(1)
+      inv.should_receive(:odba_store).times(1)
+      inv.should_receive(:info).and_return('info')
+      flexstub(Invoice).should_receive(:find_by_unique_id)\
+        .with('12').and_return(inv)
+      res = nil
+      assert_logged(:info, :debug) {
+        res = @session.mark_paid(12, date)
+      }
+      assert_equal('info', res)
+    end
+    def test_open_invoice_infos
+      open = flexmock('open')
+      open.should_receive(:info).and_return('open info')
+      due = flexmock('due')
+      due.should_receive(:info).and_return('due info')
+      flexstub(Invoice).should_receive(:search_by_status)\
+        .with('is_open').and_return([open])
+      flexstub(Invoice).should_receive(:search_by_status)\
+        .with('is_due').and_return([due])
+      res = nil
+      assert_logged(:debug) {
+        res = @session.open_invoice_infos
+      }
+      assert_equal(['open info', 'due info'], res)
+    end
+    # The entries come from the client, already parsed; the daemon never reads
+    # the statement files itself.
+    def entry(amount, remittance)
+      ntry = YDIM::Camt::Entry.new
+      ntry.account_iban = 'CH1100000000000000001'
+      ntry.amount = amount
+      ntry.currency = 'CHF'
+      ntry.credit = true
+      ntry.status = 'BOOK'
+      ntry.booking_date = Date.new(2026, 7, 10)
+      ntry.reference = "REF#{amount}"
+      ntry.remittance.push(remittance)
+      ntry
+    end
+    def invoice_info(id, total, paid = nil)
+      info = flexmock("info#{id}")
+      info.should_receive(:unique_id).and_return(id)
+      info.should_receive(:total_brutto).and_return(total)
+      info.should_receive(:currency).and_return('CHF')
+      info.should_receive(:date).and_return(Date.new(2026, 7, 1))
+      info.should_receive(:debitor_name).and_return('Example AG')
+      info.should_receive(:payment_received).and_return(paid)
+      info.should_receive(:deleted).and_return(false)
+      info
+    end
+    def stub_invoice_book
+      config = flexmock('config')
+      config.should_receive(:camt_accounts)\
+        .and_return(['CH1100000000000000001'])
+      @serv.should_receive(:config).and_return { config }
+      open = flexmock('open invoice')
+      open.should_receive(:info).and_return(invoice_info(10001, 500.00))
+      flexstub(Invoice).should_receive(:search_by_status)\
+        .with('is_open').and_return([open])
+      flexstub(Invoice).should_receive(:search_by_status)\
+        .with('is_due').and_return([])
+    end
+    def test_reconcile_camt
+      stub_invoice_book
+      flexstub(Invoice).should_receive(:find_by_unique_id).and_return(nil)
+      entries = [entry(500.00, 'RG 10001'), entry(42.00, 'RG 99999')]
+      res = nil
+      assert_logged(:info, :debug) {
+        res = @session.reconcile_camt(entries)
+      }
+      assert_equal(1, res.applicable.size)
+      assert_equal([10001], res.applicable.first.invoice_ids)
+      assert_equal(1, res.unmatched.size)
+      # Read-only without :apply.
+      assert_equal([], res.applied)
+    end
+    def test_reconcile_camt__apply
+      stub_invoice_book
+      paid = flexmock('invoice to settle')
+      paid.should_receive(:payment_received=).with(Date.new(2026, 7, 10))\
+        .times(1)
+      paid.should_receive(:odba_store).times(1)
+      paid.should_receive(:info).and_return('settled')
+      flexstub(Invoice).should_receive(:find_by_unique_id)\
+        .with('10001').and_return(paid)
+      res = nil
+      assert_logged(:info, :debug, :info, :debug) {
+        res = @session.reconcile_camt([entry(500.00, 'RG 10001')],
+          :apply => true)
+      }
+      assert_equal(1, res.applied.size)
+    end
+    # A credit on a private account must never settle an invoice, however
+    # exactly it matches.
+    def test_reconcile_camt__other_account
+      stub_invoice_book
+      ntry = entry(500.00, 'RG 10001')
+      ntry.account_iban = 'CH2200000000000000002'
+      res = nil
+      assert_logged(:info, :debug) {
+        res = @session.reconcile_camt([ntry])
+      }
+      assert_equal([], res.applicable)
+      assert_equal(1, res.skipped[:other_account])
+    end
 	end
 end

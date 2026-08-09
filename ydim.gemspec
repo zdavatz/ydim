@@ -30,6 +30,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rclconf"
   spec.add_dependency "needle"
   spec.add_dependency "ypdf-writer"
+  # ypdf-writer allows color >= 1.4.0, but color 2.0 removed the named
+  # constants it refers to while loading (Color::RGB::Blue), so a fresh
+  # install cannot even require pdf/writer and no invoice renders.
+  spec.add_dependency "color", "< 2"
   spec.add_dependency "rrba"
   spec.add_dependency "hpricot"
   spec.add_dependency "pkg-config"
@@ -38,9 +42,16 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "flexmock"
+  # test_root_session.rb's assert_logged relies on flexmock passing the block
+  # to and_return as a trailing argument; flexmock 3 stopped doing that and
+  # every test using it dies with "undefined method `call' for nil".
+  spec.add_development_dependency "flexmock", "< 3"
   spec.add_development_dependency "test-unit"
-  spec.add_development_dependency "minitest"
+  # The suite runs on flexmock/test_unit, which needs the
+  # Minitest::Unit::TestCase shim that MT_COMPAT=1 enables. Minitest 6 dropped
+  # it, and every test file then fails to load with "undefined method
+  # `teardown'".
+  spec.add_development_dependency "minitest", "< 6"
   spec.add_development_dependency "rspec"
 end
 

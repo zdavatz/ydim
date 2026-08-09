@@ -1,0 +1,120 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+# ydim-camt -- ydim -- 09.08.2026 -- zdavatz@ywesee.com
+#
+# Reconciles bank statements (ISO-20022 camt.053, as downloaded from UBS
+# e-banking) against the open invoices. Reports by default; only books a
+# payment when told to with --apply, and even then only when the payer named
+# the invoice and the amount matches to the cent.
+#
+#   ydim-camt ~/Downloads/statements.zip
+#   ydim-camt --apply ~/Downloads/statements.zip
+#   ydim-camt --account CH87... /var/ydim/camt/
+
+require 'openssl'
+require 'optparse'
+require 'rrba/error'
+require 'ydim/camt'
+require 'ydim/client'
+require 'ydim/config'
+require 'ydim/reconciler'
+
+options = { :apply => false, :verbose => false, :accounts => [] }
+parser = OptionParser.new { |opt|
+  opt.banner = "Usage: ydim-camt [options] <statements.zip|directory|file.xml>"
+  opt.on('--apply', 'mark unambiguously matched invoices as paid') {
+    options[:apply] = true }
+  opt.on('--account IBAN', 'account to reconcile (repeatable); ',
+    'defaults to camt_accounts from the config') { |iban|
+    options[:accounts].push(iban) }
+  opt.on('-v', '--verbose', 'also list credits that matched nothing') {
+    options[:verbose] = true }
+  opt.on('-h', '--help') { puts opt; exit }
+}
+# Every ydim executable also takes its configuration on the command line, in
+# RCLConf's "key=value" form -- those are not statements to read, they were
+# already picked up from ARGV when ydim/config was required.
+paths = parser.parse(ARGV.dup).reject { |arg| arg =~ /\A[\w.]+=/ }
+if paths.empty?
+  warn parser
+  exit 1
+end
+missing = paths.reject { |path| File.exist?(path) }
+unless missing.empty?
+  warn "no such file: #{missing.join(', ')}"
+  exit 1
+end
+
+entries = paths.flat_map { |path| YDIM::Camt.entries(path) }
+if entries.empty?
+  warn "no camt entries found in #{paths.join(', ')}"
+  exit 1
+end
+
+config = YDIM::Client::CONFIG
+accounts = options[:accounts]
+accounts = [config.camt_accounts].flatten.compact if accounts.empty?
+if accounts.empty?
+  warn "no account to reconcile: pass --account IBAN, or set camt_accounts " \
+    "in the config to the IBAN of the ywesee business account. The private " \
+    "accounts in the same download must not be matched against invoices."
+  exit 1
+end
+
+def show(match, marker)
+  ids = match.invoice_ids
+  printf("  %-11s %10.2f %s  %s  %s\n", ids.first || '?',
+    match.entry.amount.to_f, match.entry.currency,
+    match.entry.booking_date, match.entry.counterparty.to_s[0, 30])
+  ids[1..-1].to_a.each { |id| printf("  %-11s\n", id) }
+  puts "  #{' ' * 11} #{marker} #{match.reason}"
+end
+
+server = DRb::DRbObject.new(nil, config.server_url)
+client = YDIM::Client.new(config)
+key = OpenSSL::PKey::DSA.new(File.read(config.private_key))
+
+DRb.start_service
+client.login(server, key)
+begin
+  result = client.reconcile_camt(entries,
+    :apply => options[:apply], :accounts => accounts)
+
+  applicable = result.applicable
+  puts(options[:apply] ? "BOOKED AS PAID" \
+    : "MATCHED (would be marked paid with --apply)")
+  if applicable.empty?
+    puts "  none"
+  else
+    applicable.each { |match| show(match, match.applied? ? '+' : '~') }
+  end
+
+  review = result.review
+  unless review.empty?
+    puts
+    puts "REVIEW (never booked automatically)"
+    review.each { |match| show(match, '?') }
+  end
+
+  unmatched = result.unmatched
+  if options[:verbose] && !unmatched.empty?
+    puts
+    puts "UNMATCHED CREDITS"
+    unmatched.each { |match| show(match, '-') }
+  end
+
+  puts
+  summary = ["#{applicable.size} matched", "#{review.size} to review",
+    "#{unmatched.size} unmatched"]
+  summary.push("#{result.applied.size} booked") if options[:apply]
+  result.skipped.sort_by { |reason, count| reason.to_s }.each { |reason, count|
+    summary.push("#{count} #{reason.to_s.tr('_', ' ')}") if count > 0
+  }
+  puts summary.join(', ')
+  unless options[:apply] || applicable.empty?
+    puts "run again with --apply to mark the #{applicable.size} matched " \
+      "invoice(s) paid"
+  end
+ensure
+  client.logout
+end

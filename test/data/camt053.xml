@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic camt.053, shaped like the UBS Z53 downloads: a business account
+     and a private account in the same delivery, one statement re-sent under a
+     new MsgId, and the remittance information in the forms payers actually
+     use. All IBANs, names and numbers are made up. -->
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  <BkToCstmrStmt>
+    <GrpHdr>
+      <MsgId>TESTMSG0001</MsgId>
+      <CreDtTm>2026-07-31T18:00:00+02:00</CreDtTm>
+    </GrpHdr>
+    <!-- The business account: this is the one ydim reconciles. -->
+    <Stmt>
+      <Id>TESTSTMT0001</Id>
+      <ElctrncSeqNb>1</ElctrncSeqNb>
+      <CreDtTm>2026-07-31T18:00:00+02:00</CreDtTm>
+      <Acct>
+        <Id><IBAN>CH1100000000000000001</IBAN></Id>
+        <Ccy>CHF</Ccy>
+        <Ownr><Nm>Test Business GmbH</Nm></Ownr>
+      </Acct>
+      <Bal>
+        <Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp>
+        <Amt Ccy="CHF">1000.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Dt><Dt>2026-07-01</Dt></Dt>
+      </Bal>
+      <Bal>
+        <Tp><CdOrPrtry><Cd>CLBD</Cd></CdOrPrtry></Tp>
+        <Amt Ccy="CHF">4433.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Dt><Dt>2026-07-31</Dt></Dt>
+      </Bal>
+      <!-- Invoice named and the amount agrees: bookable without review. -->
+      <Ntry>
+        <Amt Ccy="CHF">500.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-10</Dt></BookgDt>
+        <ValDt><Dt>2026-07-10</Dt></ValDt>
+        <AcctSvcrRef>REFA1</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Example AG</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>RG 10001 VOM 1.7.2026</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit</AddtlNtryInf>
+      </Ntry>
+      <!-- One transfer settling two invoices, with the numbers run together
+           exactly as the payer's software writes them. -->
+      <Ntry>
+        <Amt Ccy="CHF">300.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-11</Dt></BookgDt>
+        <ValDt><Dt>2026-07-11</Dt></ValDt>
+        <AcctSvcrRef>REFA2</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Example AG</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>RG 10002 VOM 2.7.2026RG 10003 VOM 3.7.2026</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit</AddtlNtryInf>
+      </Ntry>
+      <!-- No reference at all: only the amount and the payer's name to go on. -->
+      <Ntry>
+        <Amt Ccy="CHF">250.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-12</Dt></BookgDt>
+        <ValDt><Dt>2026-07-12</Dt></ValDt>
+        <AcctSvcrRef>REFA3</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Nameless AG</Nm></Pty></Dbtr></RltdPties>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>e-banking Credit</AddtlNtryInf>
+      </Ntry>
+      <!-- TWINT: the remittance information is the payer's phone number. -->
+      <Ntry>
+        <Amt Ccy="CHF">42.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-13</Dt></BookgDt>
+        <ValDt><Dt>2026-07-13</Dt></ValDt>
+        <AcctSvcrRef>REFA4</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><PstlAdr><AdrLine>Twint, Payer</AdrLine></PstlAdr></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>+41791234567                       TWINT-Acc.:+41790000000</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit UBS TWINT // TWINT, PAYER</AddtlNtryInf>
+      </Ntry>
+      <!-- A machine-generated hex reference that happens to contain "10004".
+           Reading an invoice number out of it would be an accident. -->
+      <Ntry>
+        <Amt Ccy="CHF">777.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-14</Dt></BookgDt>
+        <ValDt><Dt>2026-07-14</Dt></ValDt>
+        <AcctSvcrRef>REFA5</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <Refs><EndToEndId>0ebf10004f364fc394da3e2776a05643</EndToEndId></Refs>
+          <RltdPties><Dbtr><Pty><Nm>Hexadecimal AG</Nm></Pty></Dbtr></RltdPties>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>e-banking Credit</AddtlNtryInf>
+      </Ntry>
+      <!-- Money going out is never a payment on an invoice we issued. -->
+      <Ntry>
+        <Amt Ccy="CHF">99.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-15</Dt></BookgDt>
+        <ValDt><Dt>2026-07-15</Dt></ValDt>
+        <AcctSvcrRef>REFA6</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Cdtr><Pty><Nm>Supplier AG</Nm></Pty></Cdtr></RltdPties>
+          <RmtInf><Strd><CdtrRefInf>
+            <Tp><CdOrPrtry><Prtry>QRR</Prtry></CdOrPrtry></Tp>
+            <Ref>102316851467000225775300000</Ref>
+          </CdtrRefInf><AddtlRmtInf>QRR</AddtlRmtInf></Strd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Payment Order</AddtlNtryInf>
+      </Ntry>
+      <!-- Still pending: it can be reversed, so it must not settle anything. -->
+      <Ntry>
+        <Amt Ccy="CHF">123.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>PDNG</Cd></Sts>
+        <BookgDt><Dt>2026-07-16</Dt></BookgDt>
+        <ValDt><Dt>2026-07-16</Dt></ValDt>
+        <AcctSvcrRef>REFA7</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Pending AG</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>RG 10005</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit</AddtlNtryInf>
+      </Ntry>
+      <!-- Right invoice, not enough money. -->
+      <Ntry>
+        <Amt Ccy="CHF">640.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-17</Dt></BookgDt>
+        <ValDt><Dt>2026-07-17</Dt></ValDt>
+        <AcctSvcrRef>REFA8</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Partial AG</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>Rechnung 10006</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit</AddtlNtryInf>
+      </Ntry>
+      <!-- Names an invoice that was settled on an earlier run. -->
+      <Ntry>
+        <Amt Ccy="CHF">1000.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-18</Dt></BookgDt>
+        <ValDt><Dt>2026-07-18</Dt></ValDt>
+        <AcctSvcrRef>REFA9</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Prompt AG</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>RG 10007</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit</AddtlNtryInf>
+      </Ntry>
+    </Stmt>
+    <!-- The same day delivered a second time under a new statement id. -->
+    <Stmt>
+      <Id>TESTSTMT0002</Id>
+      <ElctrncSeqNb>2</ElctrncSeqNb>
+      <CreDtTm>2026-07-31T18:00:00+02:00</CreDtTm>
+      <Acct>
+        <Id><IBAN>CH1100000000000000001</IBAN></Id>
+        <Ccy>CHF</Ccy>
+        <Ownr><Nm>Test Business GmbH</Nm></Ownr>
+      </Acct>
+      <Ntry>
+        <Amt Ccy="CHF">500.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-10</Dt></BookgDt>
+        <ValDt><Dt>2026-07-10</Dt></ValDt>
+        <AcctSvcrRef>REFA1</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Example AG</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>RG 10001 VOM 1.7.2026</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit</AddtlNtryInf>
+      </Ntry>
+    </Stmt>
+    <!-- A private account rides along in the same download. Nothing here is
+         ever a payment on a ydim invoice, however well it seems to match. -->
+    <Stmt>
+      <Id>TESTSTMT0003</Id>
+      <ElctrncSeqNb>3</ElctrncSeqNb>
+      <CreDtTm>2026-07-31T18:00:00+02:00</CreDtTm>
+      <Acct>
+        <Id><IBAN>CH2200000000000000002</IBAN></Id>
+        <Ccy>CHF</Ccy>
+        <Ownr><Nm>Private Person</Nm></Ownr>
+      </Acct>
+      <Ntry>
+        <Amt Ccy="CHF">500.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-07-19</Dt></BookgDt>
+        <ValDt><Dt>2026-07-19</Dt></ValDt>
+        <AcctSvcrRef>REFB1</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>Example AG</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Ustrd>RG 10001 VOM 1.7.2026</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+        <AddtlNtryInf>Credit</AddtlNtryInf>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

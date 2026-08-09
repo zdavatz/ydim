@@ -47,9 +47,10 @@ current in the DB.
 
 **Session/API surface**: `Server#login` → `RootUser#new_session` → `RootSession` wrapped in
 `ODBA::DRbWrapper`. **`RootSession` is the entire remote API** — every method a client can
-call (`create_invoice`, `add_items`, `send_invoice`, `debitors`, `collect_garbage`, …) is a
-public method there. Adding a client-callable operation means adding it to `RootSession`.
-`Client#method_missing` forwards everything to the session, so clients need no stubs.
+call (`create_invoice`, `add_items`, `send_invoice`, `debitors`, `collect_garbage`,
+`mark_paid`, `reconcile_camt`, …) is a public method there. Adding a client-callable
+operation means adding it to `RootSession`. `Client#method_missing` forwards everything to
+the session, so clients need no stubs.
 
 **Domain**: `Debitor` (1→n `Invoice` and `AutoInvoice`) → `Item`. `Invoice#status` is
 computed, not stored (`is_trash` / `is_paid` / `is_due` / `is_open`). `AutoInvoice` is a
@@ -71,6 +72,27 @@ added (`RootSession#add_items`), when autoinvoices are materialised (`Factory`),
 by `Invoice#suppress_vat=`. `Debitor#foreign?` (country != `config.home_country`) makes
 `Factory` suppress VAT at creation time. Changing the rate touches all of these plus the
 `texts.tax` string in pdfinvoice config.
+
+**Payment reconciliation**: `lib/ydim/camt.rb` parses ISO-20022 camt.052/053/054 statements
+(rexml only, no DB — the namespace is read off the document root, so any minor version
+works), and `lib/ydim/reconciler.rb` matches booked credits against invoices. The CLI
+(`ydim-camt`) parses client-side and sends `Camt::Entry` objects to
+`RootSession#reconcile_camt`, so the daemon never touches the files. Results carry
+`Reconciler::InvoiceRef`, not `Invoice::Info`, so a client can unmarshal them with
+`ydim/reconciler` alone instead of loading the whole server.
+
+Three rules that the real UBS data forces and that are easy to break:
+- **Filter by IBAN.** An e-banking download holds every account the login sees, private ones
+  included; `config.camt_accounts` says which are ydim's, and `Reconciler#reconcile` raises
+  rather than run without it.
+- **Dedup by `AcctSvcrRef`.** UBS re-sends the same day under a new `MsgId`; in the sample
+  set 60 of 142 entries were redeliveries.
+- **Whole digit runs only** (`Camt::Entry::TOKEN_PATTERN`) — never a substring, and never a
+  run touching a letter. TWINT credits carry the payer's phone number, and bank
+  `EndToEndId`s are hex that happens to contain 5-digit sequences.
+
+Only `:exact` and `:split` matches (invoice named *and* amount equal to the cent) are ever
+applied; everything else is reported for review.
 
 **PDF**: `lib/pdfinvoice/` is a vendored sub-library (PDF::Writer based) with its own config;
 `Invoice#pdf_invoice` maps ydim items onto it and overrides `formats`/`texts.tax` per invoice.
@@ -102,6 +124,9 @@ diverge. Note `ydim-edit` carries its own duplicated defaults hash, separate fro
 
 - `ydim-edit` — IRB console with a live `$server` / `$needle` (Needle registry) against the DB.
 - `ydim-inject` — reads a YAML invoice on stdin, creates and mails it through a `Client`.
+- `ydim-camt` — reconciles a camt.053 zip/directory/file against the open invoices; reports
+  by default, books only with `--apply`. Config overrides are RCLConf's `key=value` form,
+  not `--key value`, so the OptionParser call filters those out of the file arguments.
 - `ydim_migrate_to_utf_8` — one-off LATIN1→UTF-8 DB migration (repo root, not `bin/`).
 - `get_db_ydim` — shell script pulling a nightly Postgres dump and restoring it locally.
 

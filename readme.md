@@ -59,6 +59,8 @@ All server side configuration is read from `/etc/ydim` (since version 1.1.4/1.1.
   Defaults are in `lib/ydim/server_config.rb`.
 * `/etc/ydim/ydim.yml` — the client (`server_url`, `private_key`, currency, payment period).
   Defaults are in `lib/ydim/config.rb`.
+* `camt_accounts` (in both files) — the IBANs ydim invoices are paid into, used by
+  `ydim-camt`. See *Checking payments* below.
 * `/etc/ydim/conf/` — key material, e.g. the `root_dsa` public key used to authenticate.
 * `~/.pdfinvoice/config.yml` or `/etc/pdfinvoice/config.yml` — creditor address, bank
   details, logo and texts of the generated PDF. Defaults are in `lib/pdfinvoice/config.rb`,
@@ -75,6 +77,36 @@ Any default may also be overridden on the command line, e.g. `--log_level DEBUG`
 
 The daemon additionally runs three daily jobs: generating and mailing due auto-invoices,
 updating currency conversion rates, and refreshing the stored invoice status.
+
+## Checking payments
+
+`ydim-camt` matches the credits on a bank statement against the open invoices. It reads the
+ISO-20022 camt.053 files banks provide — the zip downloaded from UBS e-banking, an unpacked
+directory, or a single xml:
+
+```
+bundle exec lib/ydim/ydim-camt ~/Downloads/statements.zip           # report only
+bundle exec lib/ydim/ydim-camt --apply ~/Downloads/statements.zip   # and book them
+```
+
+Set `camt_accounts` to the IBAN(s) ydim invoices are paid into, or pass `--account IBAN`.
+**This is required.** An e-banking download contains every account the login can see,
+including private ones, and a credit there can look exactly like a payment on an invoice.
+Rather than reconcile whatever it is given, `ydim-camt` refuses to run without being told
+which account is the business one.
+
+Without `--apply` nothing is modified. With it, only invoices whose number the payer wrote
+in the remittance information **and** whose amount matches to the cent are marked paid; one
+transfer settling several invoices counts when the amounts sum exactly. Everything else —
+a payment with no reference, a partial payment, two open invoices over the same amount — is
+listed under REVIEW and left to you. Duplicate deliveries of the same statement, debits and
+pending entries are skipped and counted in the summary.
+
+Marking a single invoice paid by hand, from `ydim-edit` or any client:
+
+```ruby
+$server.mark_paid(13363, Date.new(2026, 7, 10))
+```
 
 ## DEVELOPMENT:
 
