@@ -94,6 +94,14 @@ Three rules that the real UBS data forces and that are easy to break:
 Only `:exact` and `:split` matches (invoice named *and* amount equal to the cent) are ever
 applied; everything else is reported for review.
 
+Fetching the statements is deliberately **not** ydim's job. The automated route is EBICS
+(`Z53` is camt.053 in a zip; UBS runs EBICS 3.0, where order types give way to Business
+Transaction Formats), and it needs a bank contract, its own keys and an INI/HIA/HPB key
+ceremony. Any such fetcher belongs in a separate process that drops files into a directory —
+`ydim-camt <dir>` then works unchanged and the bank credentials stay out of the daemon. If
+this ever gets built: `ebics-api/ebics-client-php` covers EBICS 3.0 with BTD but is PHP; the
+Ruby gem `railslove/epics` is EBICS 2.5 only, with no `Z53`/FDL/BTD and no Swiss banks.
+
 **PDF**: `lib/pdfinvoice/` is a vendored sub-library (PDF::Writer based) with its own config;
 `Invoice#pdf_invoice` maps ydim items onto it and overrides `formats`/`texts.tax` per invoice.
 
