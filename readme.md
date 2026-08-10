@@ -126,8 +126,12 @@ ebics-fetch          →  /var/ydim/camt/     # separate process, own keys, cron
 ydim-camt /var/ydim/camt/
 ```
 
-That keeps the bank credentials out of the daemon and leaves the parser and reconciler
-unchanged. Re-reading statements you have already processed is harmless: entries are
+That is what [ebics-fetch](https://github.com/zdavatz/ebics-fetch) does — a Ruby EBICS 3.0
+client that generates the keys, prints the initialisation letter, runs INI/HIA/HPB and
+downloads camt.053 and camt.054 into exactly such a directory.
+
+Keeping it separate keeps the bank credentials out of the daemon and leaves the parser and
+reconciler unchanged. Re-reading statements you have already processed is harmless: entries are
 deduplicated by the bank's own `AcctSvcrRef`, and invoices already marked paid are reported
 as such rather than booked twice.
 

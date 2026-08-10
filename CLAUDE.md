@@ -98,9 +98,17 @@ Fetching the statements is deliberately **not** ydim's job. The automated route 
 (`Z53` is camt.053 in a zip; UBS runs EBICS 3.0, where order types give way to Business
 Transaction Formats), and it needs a bank contract, its own keys and an INI/HIA/HPB key
 ceremony. Any such fetcher belongs in a separate process that drops files into a directory —
-`ydim-camt <dir>` then works unchanged and the bank credentials stay out of the daemon. If
-this ever gets built: `ebics-api/ebics-client-php` covers EBICS 3.0 with BTD but is PHP; the
-Ruby gem `railslove/epics` is EBICS 2.5 only, with no `Z53`/FDL/BTD and no Swiss banks.
+`ydim-camt <dir>` then works unchanged and the bank credentials stay out of the daemon.
+
+That fetcher now exists: **https://github.com/zdavatz/ebics-fetch** (Ruby, GPLv3), written
+against the EBICS Working Group's H005 schemas, which it vendors and validates every request
+against. Do not reach for a gem instead — `railslove/epics` is EBICS 2.5 only, with no
+`Z53`/FDL/BTD and no Swiss banks. Two things it learned the hard way and ydim should not
+re-derive: EBICS 3.0 carries keys only as `ds:X509Data` (the `PubKeyValue` of EBICS 2.x is
+gone from every H005 schema, so subscribers need self-signed certificates), and the XML
+signature uses *inclusive* canonicalization, not the exclusive one most XMLDSig profiles
+default to. As of August 2026 it is complete but has never spoken to a real bank — UBS had
+not yet delivered the connection parameters.
 
 **PDF**: `lib/pdfinvoice/` is a vendored sub-library (PDF::Writer based) with its own config;
 `Invoice#pdf_invoice` maps ydim items onto it and overrides `formats`/`texts.tax` per invoice.
