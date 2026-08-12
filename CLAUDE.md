@@ -99,6 +99,9 @@ Fetching the statements is deliberately **not** ydim's job. The automated route 
 Transaction Formats), and it needs a bank contract, its own keys and an INI/HIA/HPB key
 ceremony. Any such fetcher belongs in a separate process that drops files into a directory —
 `ydim-camt <dir>` then works unchanged and the bank credentials stay out of the daemon.
+UBS's read-only entitlement is `KR`, and it covers the camt formats in ISO versions 03, 04,
+08, 09, 10 and newer — which is exactly why `Camt.parse` reads the namespace off the
+document root rather than pinning `camt.053.001.08`. Don't "simplify" that into a constant.
 
 That fetcher now exists: **https://github.com/zdavatz/ebics-fetch** (Ruby, GPLv3), written
 against the EBICS Working Group's H005 schemas, which it vendors and validates every request

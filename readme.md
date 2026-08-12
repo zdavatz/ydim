@@ -112,11 +112,17 @@ $server.mark_paid(13363, Date.new(2026, 7, 10))
 
 UBS e-banking offers no API for statements, so today they are fetched as a zip through the
 browser. The automated channel in Switzerland is **EBICS**: order type `Z53` delivers exactly
-these camt.053 files in a zip container (`Z52` is camt.052, `Z54` camt.054). UBS offers it
-for business accounts as EBICS 3.0, where the classic order types are replaced by Business
+these camt.053 files in a zip container (`Z52` is camt.052, `Z54` camt.054). UBS sells it as
+**KeyPort**, and the entitlement that covers those is `KR` (Kundenreport) — read-only, no
+payment rights. It runs as EBICS 3.0, where the classic order types are replaced by Business
 Transaction Formats, so the bank has to state the BTF parameters for camt.053 alongside the
 usual HostID, URL, partner and user id. Setting it up is a bank contract plus a key
 ceremony (INI/HIA, a signed initialisation letter, then HPB) — not an API key.
+
+`KR` entitles you to the camt formats in **ISO versions 03, 04, 08, 09, 10 and newer**, so
+which one arrives is a setting rather than a fixture. The parser takes the namespace from
+the document root instead of pinning a version, which is why a switch from camt.053.001.08
+to .09 needs no change here.
 
 Whatever fetches them, keep it **outside** ydim. Have it drop the files in a directory and
 point `ydim-camt` at that:
@@ -138,6 +144,8 @@ as such rather than booked twice.
 Ask the bank to scope the EBICS access to the business account only. An e-banking login
 that also sees private accounts will otherwise deliver those too, and while `camt_accounts`
 filters them out, statements you never needed should not reach the server in the first place.
+This is worth checking on the paperwork rather than assuming: UBS's "bewirtschaftbare Konten"
+sheet happily lists a private relationship for reporting if a power of attorney covers it.
 
 ## DEVELOPMENT:
 
